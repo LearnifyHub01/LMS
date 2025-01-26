@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist",          // Output directory for compiled files
+    "target": "ES2020",          // Target version for JS code
+    "lib": ["ES2020"],           // Include ES2020 standard library
+    "typeRoots": ["./node_modules/@types", "./@types"], // Include custom types
+    "types": ["node", "express", "jsonwebtoken"]  // Include necessary types
+  },
+  "include": [
+    "**/*.ts",              // Include all .ts files in the server folder and subfolders
+    "@types/**/*.ts"        // Include custom types from @types folder
+  ],
+  "exclude": ["node_modules"]  // Exclude node_modules folder from being compiled
+}

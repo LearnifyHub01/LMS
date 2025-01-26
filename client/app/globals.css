@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0,0,0;
+  --background-start-rgb: 214,219,220;
+  --background-end-rgb: 255,255,255;
+  
+}
+
+
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255,255,255;
+    --background-start-rgb: 0,0,0;
+    --background-end-rgb: 0,0,0;
+  }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button
+{
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"]
+{
+  -moz-appearance: textfield;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+}
+
+.code-inputs-container {
+  @apply flex justify-center gap-4 mt-6;
+}
+
+.verification-input {
+  @apply w-12 h-12 text-xl text-center border-2 rounded-lg outline-none transition;
+}
+
+.verification-input:focus {
+  @apply border-blue-500 shadow-md;
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  margin-left: 9%;
+  max-width: 420px; /* Increased maximum width */
+  height: 400px; /* Increased height */
+  overflow: hidden; /* Ensures the image doesn't overflow its container */
+  border-radius: 1rem; /* Adds rounded corners */
+  margin-bottom: 20px; /* Space below the image */
+  display: flex;
+  justify-content: flex-end; /* Moves the image to the right */
+  align-items: center;
+}
+
+/* Style for the image */
+.hero-image {
+  object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
+  width: 100%;
+  height: 100%;
+  filter: brightness(0.9); /* Slightly darkens the image for better visibility */
+  transition: filter 0.3s ease; /* Smooth transition effect when switching modes */
+}
+
+/* Dark mode styles */
+body.dark-mode .hero-image {
+  filter: brightness(0.7); /* Darken the image more in dark mode */
+}
+
+
