@@ -12,6 +12,8 @@ import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { useSession } from "next-auth/react";
 import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
+import avatar from "../../public/assests/download5.png";
+import Image from "next/image";
 
 type Props = {
   open: boolean;
@@ -25,25 +27,23 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
-  const {data} = useSession()
-  const [socialAuth,{isSuccess,error}]=useSocialAuthMutation()
+  const { data } = useSession();
+  const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
 
-  useEffect(()=>{
-    if(!user){
-      if(data){
+  useEffect(() => {
+    if (!user) {
+      if (data) {
         socialAuth({
-          email:data?.user?.email,
-          name:data?.user?.name,
-          avatar:data?.user?.image
-        })
+          email: data?.user?.email,
+          name: data?.user?.name,
+          avatar: data?.user?.image,
+        });
       }
     }
-    if(isSuccess){
-      toast.success('Login Successfully')
+    if (isSuccess) {
+      toast.success("Login Successfully");
     }
-    
-  },[data,user])
-
+  }, [data, user]);
 
   useEffect(() => {
     // Add a scroll listener to change header styles based on scroll position
@@ -77,6 +77,8 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     setOpenSidebar(false);
     setOpen(true);
   };
+  console.log('data',data)
+  console.log('user',user)
 
   return (
     <div className="w-full relative py-0">
@@ -89,7 +91,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
       >
         <div className="w-[95%] 800px:w-[92%] m-auto py-1 h-full">
           <div className="w-full h-[70px] flex items-center justify-between p-3">
-            {/* Logo Section */}
+            {/* Logo Section  */}
             {/* <div>
               <Link href={"/"}>
                 <Image
@@ -111,12 +113,12 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               </Link>
             </div>
 
-            {/* Desktop Nav Items */}
+            {/* Desktop Nav Items  */}
             <div className="flex items-center">
               <NavItems activeItem={activeItem} isMobile={false} />
               <ThemeSwitcher />
 
-              {/* sidebar Menu for Mobile */}
+              {/* sidebar Menu for Mobile  */}
               <div className="800px:hidden ml-4">
                 <HiOutlineMenuAlt3
                   size={25}
@@ -125,18 +127,26 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                 />
               </div>
 
-              {/* User Icon */}
-
-              <FiUser
-                size={25}
-                className="hidden 800px:block cursor-pointer dark:text-white text-black ml-7"
-                onClick={handleUserIconClick}
-              />
+              {user ? (
+                <Link href={"/profile"}>
+                  <Image
+                    src={user.image ? user.image : avatar}
+                    alt=""
+                    className="w-[30px] h-[30px] rounded-full ml-5 hidden 800px:block cursor-pointer"
+                  />
+                  </Link>
+              ) : (
+                <FiUser
+                  size={25}
+                  className="hidden 800px:block cursor-pointer dark:text-white text-black ml-7"
+                  onClick={handleUserIconClick}
+                />
+              )} 
             </div>
           </div>
         </div>
 
-        {/* Mobile Sidebar */}
+         {/* Mobile Sidebar  */}
         {openSidebar && (
           <div
             className="fixed w-full h-screen top-0 left-0 z-[99999] dark:bg-[unset] bg-[#0000024]"
@@ -145,11 +155,22 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
           >
             <div className="w-[60%] fixed h-screen top-0 right-0 z-[999999999] bg-white dark:bg-slate-900 dark:bg-opacity-90 overflow-y-auto transition-all duration-300 ease-in-out">
               <NavItems activeItem={activeItem} isMobile={true} />
-              <FiUser
-                size={25}
-                className="cursor-pointer dark:text-white text-black ml-5 my-2"
-                onClick={handleUserIconClick}
-              />
+              {user ? (
+                                    <Link href={"/profile"} > 
+
+                  <Image
+                    src={user.avatar ? user.avatar : avatar}
+                    alt="my image"
+                    className="w-[30px] h-[30px] cursor-pointer rounded-full ml-5"
+                  />
+                    </Link>
+              ) : (
+                <FiUser
+                  size={25}
+                  className="cursor-pointer dark:text-white text-black ml-5 my-2"
+                  onClick={handleUserIconClick}
+                />
+              )}
 
               <br />
               <p className="text-[16px] px-2 py-5 text-black dark:text-white">
@@ -160,7 +181,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
         )}
       </div>
 
-      {/* Authentication Modals */}
+      {/* Authentication Modals  */}
       {route === "Login" && open && (
         <CustomModel
           open={open}

@@ -6,15 +6,17 @@ import { ThemeProvider } from "./utils/theme-provider";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./Providers";
 import {SessionProvider} from "next-auth/react"
+import Loader from "./components/Loader/Loader"
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 
 const poppins = Poppins({
-  subsets: ["latin", "latin-ext"],  // You can include more subsets like 'cyrillic' if needed
+  subsets: ["latin", "latin-ext"],  
   variable: "--font-poppins",
   weight: ["400", "500","600", "700"],  
 });
 
 const josefin = Josefin_Sans({
-  subsets: ["latin", "latin-ext"],  // Add more subsets as needed
+  subsets: ["latin", "latin-ext"],  
   variable: "--font-josefin-sans",
   weight: ["400", "500","600", "700"],  
 });
@@ -31,7 +33,9 @@ export default function RootLayout({
         <Providers>
           <SessionProvider>
         <ThemeProvider attribute='class' defaultTheme="system" enableSystem>
+         <Custom>
           {children}
+         </Custom>
           <Toaster position="top-center" reverseOrder={false}/>
         </ThemeProvider>
         </SessionProvider>
@@ -39,4 +43,15 @@ export default function RootLayout({
       </body>
     </html>
   );
+}
+
+const Custom : React.FC<{children : React.ReactNode}> = ({children})=>{
+  const {isLoading} = useLoadUserQuery({})
+  return(
+    <>
+    {
+      isLoading ? <Loader /> : <>{children}</>
+    }
+    </>
+  )
 }
