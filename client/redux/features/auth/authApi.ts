@@ -1,6 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { userLoggedIn, userRegistration } from "./authSlice";
-
+import { userLoggedIn, userLoggedOut, userRegistration } from "./authSlice";
 
 type RegistrationResponse = {
   message: string;
@@ -11,7 +10,6 @@ type RegistrationData = {};
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-
     //query like get requet  and mutation like post
     //this  is use for sending request
     register: builder.mutation<RegistrationResponse, RegistrationData>({
@@ -21,7 +19,7 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
         credentials: "include" as const,
       }),
-    //this is get data and save into userRegistration reducer
+      //this is get data and save into userRegistration reducer
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
@@ -56,7 +54,6 @@ export const authApi = apiSlice.injectEndpoints({
           password,
         },
         credentials: "include" as const,
-        
       }),
 
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
@@ -74,13 +71,13 @@ export const authApi = apiSlice.injectEndpoints({
       },
     }),
     socialAuth: builder.mutation({
-      query: ({ email, name , avatar }) => ({
+      query: ({ email, name, avatar }) => ({
         url: "social-auth",
         method: "POST",
         body: {
           email,
           name,
-          avatar
+          avatar,
         },
         credentials: "include" as const,
       }),
@@ -94,7 +91,23 @@ export const authApi = apiSlice.injectEndpoints({
               user: result.data.user,
             })
           );
-       
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
+    logOut: builder.query({
+      query: () => ({
+        url: "logout",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          dispatch(
+            userLoggedOut()
+          );
         } catch (error: any) {
           console.log(error);
         }
@@ -103,4 +116,10 @@ export const authApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useRegisterMutation, useActivationMutation, useLoginMutation ,useSocialAuthMutation } = authApi;
+export const {
+  useRegisterMutation,
+  useActivationMutation,
+  useLoginMutation,
+  useSocialAuthMutation,
+  useLogOutQuery
+} = authApi;

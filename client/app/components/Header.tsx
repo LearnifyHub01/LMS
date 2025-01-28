@@ -43,6 +43,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     if (isSuccess) {
       toast.success("Login Successfully");
     }
+    
   }, [data, user]);
 
   useEffect(() => {
@@ -132,14 +133,15 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                   <Image
                     src={user?.avatar?.url ? user?.avatar?.url : avatar}
                     alt="a"
-                    width={25}  // Specify width
-                    height={25} // Specify height
+                    width={30}  // Specify width
+                    height={30} // Specify height
                     className="w-[30px] h-[30px] rounded-full ml-5 hidden 800px:block cursor-pointer"
+                    style={{border:activeItem === 5 ? '2px solid #37a39a' : 'none'}}
                   />
                   </Link>
               ) : (
                 <FiUser
-                  size={25}
+                  size={30}
                   className="hidden 800px:block cursor-pointer dark:text-white text-black ml-7"
                   onClick={handleUserIconClick}
                 />

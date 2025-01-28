@@ -11,7 +11,7 @@ type Props = {};
 
 const Page: FC<Props> = () => { // Corrected component name to start with uppercase
   const [open, setOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState(0);
+  const [activeItem, setActiveItem] = useState(5);
   const [route, setRoute] = useState("Login");
 
   // Use the useSelector hook to get the user from Redux state

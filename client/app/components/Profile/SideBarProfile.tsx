@@ -24,9 +24,9 @@ const SideBarProfile: FC<Props> = ({
   logOutHandler,
 }) => {
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <div
-        className={`w-full flex items-center px-3 py-4 cursor-pointer ${
+        className={`w-full flex items-center px-3 py-4 cursor-pointer  ${
           active === 1 ? "dark:bg-slate-800 bg-slate-900" : "bg-transparent"
         }`}
         onClick={() => setActive(1)}
@@ -35,8 +35,8 @@ const SideBarProfile: FC<Props> = ({
         <Image
           src={avatar || avatarDefault}
           alt="User Avatar"
-          width={30}
-          height={30}
+          width={20}
+          height={20}
           className="w-[30px] h-[30px] rounded-full"
         />
         <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-white">
@@ -44,7 +44,7 @@ const SideBarProfile: FC<Props> = ({
         </h5>
       </div>
       <div
-        className={`w-full flex items-center px-3 py-4 cursor-pointer ${
+        className={`w-full flex items-center px-3 py-4 cursor-pointer  ${
           active === 2 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
         }`}
         onClick={() => setActive(2)}
@@ -55,7 +55,7 @@ const SideBarProfile: FC<Props> = ({
         </h5>
       </div>
       <div
-        className={`w-full flex items-center px-3 py-4 cursor-pointer ${
+        className={`w-full flex items-center px-3 py-4 cursor-pointer  ${
           active === 3 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
         }`}
         onClick={() => setActive(3)}
