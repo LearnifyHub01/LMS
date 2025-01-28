@@ -130,8 +130,10 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               {user ? (
                 <Link href={"/profile"}>
                   <Image
-                    src={user.image ? user.image : avatar}
-                    alt=""
+                    src={user?.avatar?.url ? user?.avatar?.url : avatar}
+                    alt="a"
+                    width={25}  // Specify width
+                    height={25} // Specify height
                     className="w-[30px] h-[30px] rounded-full ml-5 hidden 800px:block cursor-pointer"
                   />
                   </Link>
@@ -157,9 +159,10 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               <NavItems activeItem={activeItem} isMobile={true} />
               {user ? (
                                     <Link href={"/profile"} > 
-
                   <Image
-                    src={user.avatar ? user.avatar : avatar}
+                    src={user?.avatar?.url ? user?.avatar?.url : avatar}
+                    width={25}  
+                    height={25} 
                     alt="my image"
                     className="w-[30px] h-[30px] cursor-pointer rounded-full ml-5"
                   />

@@ -56,6 +56,7 @@ export const authApi = apiSlice.injectEndpoints({
           password,
         },
         credentials: "include" as const,
+        
       }),
 
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
@@ -93,6 +94,7 @@ export const authApi = apiSlice.injectEndpoints({
               user: result.data.user,
             })
           );
+       
         } catch (error: any) {
           console.log(error);
         }
