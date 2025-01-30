@@ -43,7 +43,6 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     if (isSuccess) {
       toast.success("Login Successfully");
     }
-    
   }, [data, user]);
 
   useEffect(() => {
@@ -78,8 +77,8 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     setOpenSidebar(false);
     setOpen(true);
   };
-  console.log('data',data)
-  console.log('user',user)
+  console.log("data", data);
+  console.log("user", user);
 
   return (
     <div className="w-full relative py-0">
@@ -93,30 +92,36 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
         <div className="w-[95%] 800px:w-[92%] m-auto py-1 h-full">
           <div className="w-full h-[70px] flex items-center justify-between p-3">
             {/* Logo Section  */}
-            {/* <div>
-              <Link href={"/"}>
-                <Image
-                  src="/path/to/logo.png" // Update with the correct logo path
-                  alt="LearnifyHub Logo"
-                  width={40}
-                  height={70}
-                  className="cursor-pointer shadow-lg"
-                />
-              </Link>
-            </div> */}
 
-            <div>
+            <Link href={"/"} passHref>
+              <span
+                className={`text-[25px] font-Poppins font-[500] text-black dark:text-white`}
+              >
+                LearnifyHub
+              </span>
+            </Link>
+          {
+            openSidebar && (<div>
               <Link
                 href={"/"}
                 className="text-[25px] hidden 800px:block font-mono font-[500] text-black dark:text-white"
               >
                 LearnifyHub
               </Link>
-            </div>
+            </div>)
+          }
+            
 
             {/* Desktop Nav Items  */}
             <div className="flex items-center">
-              <NavItems activeItem={activeItem} isMobile={false} />
+              <NavItems
+                activeItem={activeItem}
+                isMobile={false}
+                user={user}
+                setOpen={setOpen}
+                openSidebar={openSidebar}
+                setOpenSidebar={setOpenSidebar}
+              />
               <ThemeSwitcher />
 
               {/* sidebar Menu for Mobile  */}
@@ -133,49 +138,41 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                   <Image
                     src={user?.avatar?.url ? user?.avatar?.url : avatar}
                     alt="a"
-                    width={30}  // Specify width
+                    width={30} // Specify width
                     height={30} // Specify height
                     className="w-[30px] h-[30px] rounded-full ml-5 hidden 800px:block cursor-pointer"
-                    style={{border:activeItem === 5 ? '2px solid #37a39a' : 'none'}}
+                    style={{
+                      border: activeItem === 5 ? "2px solid #37a39a" : "none",
+                    }}
                   />
-                  </Link>
+                </Link>
               ) : (
                 <FiUser
                   size={30}
                   className="hidden 800px:block cursor-pointer dark:text-white text-black ml-7"
                   onClick={handleUserIconClick}
                 />
-              )} 
+              )}
             </div>
           </div>
         </div>
 
-         {/* Mobile Sidebar  */}
+        {/* Mobile Sidebar  */}
         {openSidebar && (
           <div
             className="fixed w-full h-screen top-0 left-0 z-[99999] dark:bg-[unset] bg-[#0000024]"
             onClick={handleClose}
             id="screen"
           >
-            <div className="w-[60%] fixed h-screen top-0 right-0 z-[999999999] bg-white dark:bg-slate-900 dark:bg-opacity-90 overflow-y-auto transition-all duration-300 ease-in-out">
-              <NavItems activeItem={activeItem} isMobile={true} />
-              {user ? (
-                                    <Link href={"/profile"} > 
-                  <Image
-                    src={user?.avatar?.url ? user?.avatar?.url : avatar}
-                    width={25}  
-                    height={25} 
-                    alt="my image"
-                    className="w-[30px] h-[30px] cursor-pointer rounded-full ml-5"
-                  />
-                    </Link>
-              ) : (
-                <FiUser
-                  size={25}
-                  className="cursor-pointer dark:text-white text-black ml-5 my-2"
-                  onClick={handleUserIconClick}
-                />
-              )}
+            <div className="w-[60%] fixed h-screen top-0 right-0 z-[999999999] bg-white dark:bg-slate-900 dark:bg-opacity-90 overflow-y-auto transition-all duration-300 ease-in-out ">
+              <NavItems
+                activeItem={activeItem}
+                isMobile={true}
+                user={user}
+                setOpen={setOpen}
+                openSidebar={openSidebar}
+                setOpenSidebar={setOpenSidebar}
+              />
 
               <br />
               <p className="text-[16px] px-2 py-5 text-black dark:text-white">

@@ -2,6 +2,7 @@ import { styles } from '@/app/styles/style'
 import { useUpdatePasswordMutation } from '@/redux/features/user/userApi'
 import React ,{FC, useEffect, useState}from 'react'
 import toast from 'react-hot-toast'
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 
 type Props ={
     user:any
@@ -12,9 +13,14 @@ const ChangePassword:FC<Props>=({user}) =>{
   const [newPassword , setNewPassword]=useState('')
   const [confirmPassword,setConfirmPasword]=useState('')
   const[updatePassword,{isSuccess,error}] = useUpdatePasswordMutation()
+   const [loadUser,setLoadUser] = useState(false)
+ const {} = useLoadUserQuery(undefined , {
+    skip:!loadUser 
+  })
 
   const passwordChangeHandler = async(e:any)=>{
-    if(newPassword !== oldPassword){
+    e.preventDefault();
+    if(newPassword !== confirmPassword){
         toast.error("Password do not match")
     }else{
         await updatePassword({oldPassword,newPassword})
@@ -23,7 +29,11 @@ const ChangePassword:FC<Props>=({user}) =>{
 
   useEffect(()=>{
     if(isSuccess){
+        setLoadUser(true)
         toast.success("Password changed successfully")
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmPasword("");
     }
     if(error){
         if("data" in error){
@@ -31,6 +41,7 @@ const ChangePassword:FC<Props>=({user}) =>{
             toast.error(erroData.data.message)
         }
     }
+    
   },[isSuccess,error])
   return (
     <div className='w-full pl-7 px-2 800px:px-5 800px:pl-0'>
