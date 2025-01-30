@@ -14,63 +14,59 @@ type Props = {
 
 const ProfileInfo: FC<Props> = ({ avatar, user }) => {
   const [name, setName] = useState(user?.name || "");
-  const [editProfile ,{isSuccess,error}] = useEditProfileMutation()
-  const [updateAvatar ,{isSuccess:success,error:updateError}] = useUpdateAvatarMutation()
-  const [loadUser,setLoadUser] = useState(false)
-  const {} = useLoadUserQuery(undefined , {
-    skip:loadUser  ?  false : true 
-  })
+  const [editProfile, { isSuccess, error }] = useEditProfileMutation();
+  const [updateAvatar, { isSuccess: success, error: updateError }] = useUpdateAvatarMutation();
+  const [loadUser, setLoadUser] = useState(false);
+  const {} = useLoadUserQuery(undefined, {
+    skip: loadUser ? false : true,
+  });
 
-  const imageHandler = async (e: any) => {
-    const file = e.target.files[0]; // Correct property access
-    if (!file) {
-      console.log("No file selected");
-      return;
-    }
-  
+  const imageHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
     const fileReader = new FileReader();
-    fileReader.onload = () => {
+    fileReader.readAsDataURL(file);
+
+    fileReader.onload = async () => {
       if (fileReader.readyState === 2) {
-        const avatar = fileReader.result;
-        updateAvatar(avatar); // Pass the avatar to the mutation
+        const avatar = fileReader.result as string;
+        updateAvatar({ avatar });
       }
     };
-    fileReader.readAsDataURL(file);
   };
-  
-  useEffect(()=>{
-    if(isSuccess || success){
-        setLoadUser(true)
-    }
-    if(error || updateError){
-        console.log(error)
-    }
-    if(isSuccess){
-        toast.success("Profile Updated Successfully!")
-    }
-  },[isSuccess,error,success,updateError])
 
-  const handleSubmit = async(e:any) => {
+  useEffect(() => {
+    if (isSuccess || success) {
+      setLoadUser(true);
+    }
+    if (error || updateError) {
+      console.log(error);
+    }
+    if (isSuccess) {
+      toast.success("Profile Updated Successfully!");
+    }
+  }, [isSuccess, error, success, updateError]);
+
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    if(name !== ''){
-        await editProfile({
-            name:name,
-
-        })
+    if (name !== "") {
+      await editProfile({
+        name: name,
+      });
     }
-    
   };
 
   return (
-    <div className="w-full flex flex-col items-center p-10">
+    <div className="w-full flex flex-col items-center bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md">
       {/* Avatar Section */}
-      <div className="relative">
+      <div className="relative mb-6">
         <Image
           src={user?.avatar?.url || avatar || avtarIcon}
-          alt=""
+          alt="Profile Avatar"
           height={120}
           width={120}
-          className="w-[120px] h-[120px] cursor-pointer border-[3px] border-[#37a39a] rounded-full"
+          className="w-[120px] h-[120px] rounded-full border-4 border-[#37a39a] shadow-lg hover:scale-105 transition-all"
         />
         <input
           type="file"
@@ -80,24 +76,24 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
           accept="image/png,image/jpeg,image/jpg,image/webp"
         />
         <label htmlFor="avatar">
-          <div className="w-[30px] h-[30px] bg-slate-900 rounded-full absolute bottom-2 right-2 flex items-center justify-center cursor-pointer">
+          <div className="w-[35px] h-[35px] bg-[#37a39a] rounded-full absolute bottom-2 right-2 flex items-center justify-center cursor-pointer">
             <AiOutlineCamera size={20} className="text-white" />
           </div>
         </label>
       </div>
 
       {/* Profile Form Section */}
-      <div className="w-full px-6 800px:px-10 mt-6">
+      <div className="w-full max-w-md px-6 py-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
         <form onSubmit={handleSubmit}>
-          <div className="800px:w-[50%] m-auto block pb-4">
+          <div className="space-y-6">
             {/* Full Name Field */}
-            <div className="w-full">
-              <label className="block pb-2 text-black dark:text-white">
+            <div>
+              <label className="block text-lg font-semibold text-gray-800 dark:text-white mb-2">
                 Full Name
               </label>
               <input
                 type="text"
-                className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
+                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#37a39a] dark:bg-gray-700 dark:text-white dark:border-gray-600"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -105,13 +101,13 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
             </div>
 
             {/* Email Field */}
-            <div className="w-full pt-2">
-              <label className="block pb-2 text-black dark:text-white">
+            <div>
+              <label className="block text-lg font-semibold text-gray-800 dark:text-white mb-2">
                 Email Address
               </label>
               <input
                 type="text"
-                className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
+                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#37a39a] dark:bg-gray-700 dark:text-white dark:border-gray-600"
                 readOnly
                 required
                 value={user?.email}
@@ -119,9 +115,9 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-center items-center mt-8">
+            <div className="flex justify-center mt-6">
               <input
-                className="mx-auto block w-[250px] h-[40px] border border-[#37a39a] text-center dark:text-[#fff] text-black rounded-[3px] mt-8 cursor-pointer"
+                className="w-full sm:w-[250px] h-[45px] bg-[#37a39a] text-white rounded-md text-lg font-semibold cursor-pointer transition-all hover:bg-[#2d8f7b] focus:outline-none"
                 type="submit"
                 value="Update"
               />

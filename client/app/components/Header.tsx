@@ -93,25 +93,14 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
           <div className="w-full h-[70px] flex items-center justify-between p-3">
             {/* Logo Section  */}
 
-            <Link href={"/"} passHref>
-              <span
-                className={`text-[25px] font-Poppins font-[500] text-black dark:text-white`}
-              >
-                LearnifyHub
-              </span>
-            </Link>
-          {
-            openSidebar && (<div>
+            <div>
               <Link
                 href={"/"}
                 className="text-[25px] hidden 800px:block font-mono font-[500] text-black dark:text-white"
               >
                 LearnifyHub
               </Link>
-            </div>)
-          }
-            
-
+            </div>
             {/* Desktop Nav Items  */}
             <div className="flex items-center">
               <NavItems

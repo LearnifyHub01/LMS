@@ -6,7 +6,7 @@ import Heading from '@/app/utils/Heading';
 import Header from '@/app/components/Header';
 import { useSelector } from 'react-redux'; // Corrected import (useSelector, not UseSelector)
 import { usePathname } from 'next/navigation';
-import Profile from '@/app/components/Profile/Profile';
+import ChangePassword from '@/app/components/Profile/ChangePassword';
 
 type Props = {};
 
@@ -17,12 +17,12 @@ const Page: FC<Props> = () => { // Corrected component name to start with upperc
 
   // Use the useSelector hook to get the user from Redux state
   const { user } = useSelector((state: any) => state.auth);
-
+  const pathname = usePathname();
   return (
     <div>
       <Protected>
         <Heading
-          title={`${user?.name || "User"}'s profile`}  // Dynamically setting profile name
+          title={`${user?.name || "User"}'s profile`} // Dynamically setting profile name
           description="It is a good platform"
           keywords="programming,MERN"
         />
@@ -34,7 +34,7 @@ const Page: FC<Props> = () => { // Corrected component name to start with upperc
           route={route}
         />
         {/* Pass the `user` prop to the Profile component */}
-        <Profile user={user} />
+        <ChangePassword user={user} />
       </Protected>
     </div>
   );

@@ -13,7 +13,7 @@ type Props = {
 
 const Profile: FC<Props> = ({ user }) => {
   const [scroll, setScroll] = useState(false);
-  const [avatar, setAvatar] = useState<string | null>(null); // Updated state type for avatar
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [active, setActive] = useState(1);
   const [logout, setLogout] = useState(false);
   const {} = useLogOutQuery(undefined, {
@@ -45,30 +45,11 @@ const Profile: FC<Props> = ({ user }) => {
 
   return (
     <div className="w-[85%] flex mx-auto">
-      <div
-        className={`w-[60px] 800px:w-[310px] h-[450px] dark:bg-slate-900 bg-gray-800 bg-opacity-90 dark:border-[#ffffff1d]  rounded-[5px] shadow-sm mt-[80px] sticky ${
-          scroll ? "top-[120px]" : "top-[30px]"
-        } left-[30px]`}
-      >
-        <SideBarProfile
-          user={user}
-          active={active}
-          avatar={avatar} // Pass avatar to SideBarProfile
-          setActive={setActive}
-          logOutHandler={logOutHandler}
-        />
-      </div>
-      {active == 1 && (
+       (
         <div className="w-full h-full bg-transparent mt-[80px]">
           <ProfileInfo avatar={avatar} user={user} />
         </div>
-      )}
-
-      {active == 2 && (
-        <div className="w-full h-full bg-transparent mt-[80px]">
-          <ChangePassword user={user} />
-        </div>
-      )}
+      )
     </div>
   );
 };
