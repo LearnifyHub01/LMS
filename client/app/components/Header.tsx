@@ -21,6 +21,8 @@ type Props = {
   activeItem: number;
   route: string;
   setRoute: (route: string) => void;
+
+
 };
 
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
@@ -105,6 +107,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
             <div className="flex items-center">
               <NavItems
                 activeItem={activeItem}
+              
                 isMobile={false}
                 user={user}
                 setOpen={setOpen}
@@ -156,6 +159,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
             <div className="w-[60%] fixed h-screen top-0 right-0 z-[999999999] bg-white dark:bg-slate-900 dark:bg-opacity-90 overflow-y-auto transition-all duration-300 ease-in-out ">
               <NavItems
                 activeItem={activeItem}
+            
                 isMobile={true}
                 user={user}
                 setOpen={setOpen}
