@@ -429,7 +429,9 @@ export const updateProfilePicture = CatchAsyncError(
           await cloudinary.v2.uploader.destroy(user?.avatar?.public_id);
           const myCloud = await cloudinary.v2.uploader.upload(avatar, {
             folder: "avatars",
-            width: 150,
+            
+  quality: 100,
+  
           });
           user.avatar = {
             public_id: myCloud.public_id,
@@ -438,7 +440,8 @@ export const updateProfilePicture = CatchAsyncError(
         } else {
           const myCloud = await cloudinary.v2.uploader.upload(avatar, {
             folder: "avatars",
-            width: 150,
+
+            quality: 100,
           });
           user.avatar = {
             public_id: myCloud.public_id,
