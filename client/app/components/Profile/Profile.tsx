@@ -20,11 +20,6 @@ const Profile: FC<Props> = ({ user }) => {
     skip: !logout ? true : false,
   });
 
-  const logOutHandler = async () => {
-    await signOut();
-    setLogout(true);
-    redirect("/");
-  };
 
   useEffect(() => {
     // Set avatar if user.avatar.url is available
@@ -44,12 +39,12 @@ const Profile: FC<Props> = ({ user }) => {
   }, [user]); // Re-run when user changes
 
   return (
-    <div className="w-[85%] flex mx-auto">
-       (
+    <div className="w-[85%] flex mx-auto  ">
+  
         <div className="w-full h-full bg-transparent mt-[80px]">
           <ProfileInfo avatar={avatar} user={user} />
         </div>
-      )
+  
     </div>
   );
 };

@@ -97,7 +97,7 @@ const Verification: FC<Props> = ({ setRoute }) => {
             key={key}
             ref={inputRefs[index]}
             className={`verification-input ${
-              invalidError ? "shake border-red-500" : "border-gray-400"
+              invalidError ? "shake border-red-500" : "border-gray-400  dark:text-white"
             }`}
             maxLength={1}
             value={verifyNumber[key as keyof VerifyNumber]}

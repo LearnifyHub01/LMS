@@ -21,8 +21,6 @@ type Props = {
   activeItem: number;
   route: string;
   setRoute: (route: string) => void;
-
-
 };
 
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
@@ -31,6 +29,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const { user } = useSelector((state: any) => state.auth);
   const { data } = useSession();
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
+  
 
   useEffect(() => {
     if (!user) {
@@ -128,11 +127,12 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               {user ? (
                 <Link href={"/profile"}>
                   <Image
-                    src={user?.avatar?.url ? user?.avatar?.url : avatar}
-                    alt="a"
-                    width={30} // Specify width
-                    height={30} // Specify height
-                    className="w-[30px] h-[30px] rounded-full ml-5 hidden 800px:block cursor-pointer"
+                    src={user?.avatar?.url}
+                    alt="Profile Picture"
+                    height={4000}
+                    width={3000}
+                    
+                    className="w-[30px] h-[30px] rounded-full ml-5 hidden 800px:block cursor-pointer object-cover"
                     style={{
                       border: activeItem === 5 ? "2px solid #37a39a" : "none",
                     }}

@@ -39,8 +39,6 @@ const NavItems: React.FC<Props> = ({
   setOpen,
   openSidebar,
   setOpenSidebar,
-  
-
 }) => {
   const [logout, setLogout] = useState(false);
   const {} = useLogOutQuery(undefined, {
@@ -54,8 +52,10 @@ const NavItems: React.FC<Props> = ({
   const logOutHandler = async () => {
     await signOut();
     setLogout(true);
-    redirect("/");
+    redirect('/')
   };
+
+
 
 
   return (
@@ -139,11 +139,11 @@ const NavItems: React.FC<Props> = ({
                 }`}
               >
                 <Image
-                  src={user?.avatar?.url || avatarDefault}
-                  alt="User Avatar"
-                  width={20}
-                  height={20}
-                  className="w-[30px] h-[30px] rounded-full"
+                 src={user?.avatar?.url}
+                 alt="Profile Picture"
+                 height={4000}
+                 width={3000}
+                 className="w-[50] h-[50] cursor-pointer border-[2px] border-[#37a39a] rounded-full object-cover"
                 />
                 <div className="flex flex-col">
                   <span className="font-semibold text-gray-800 dark:text-gray-200">

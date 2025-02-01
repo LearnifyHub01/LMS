@@ -35,7 +35,7 @@ const Page: FC<Props> = () => { // Corrected component name to start with upperc
           route={route}
         />
         {/* Pass the `user` prop to the Profile component */}
-        <Profile user={user} />
+        <Profile user={user}/>
       </Protected>
     </div>
   );
