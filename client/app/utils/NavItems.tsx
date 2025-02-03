@@ -12,6 +12,7 @@ import { MdGroupAdd } from "react-icons/md";
 import { useLogOutQuery } from "@/redux/features/auth/authApi";
 import { redirect } from "next/navigation";
 import { signOut } from "next-auth/react";
+import avatar from "../../public/assests/download5.png";
 
 export const NavItemsData = [
   { name: "Home", url: "/" },
@@ -139,7 +140,7 @@ const NavItems: React.FC<Props> = ({
                 }`}
               >
                 <Image
-                 src={user?.avatar?.url}
+                 src={user?.avatar?.url ||avatar }
                  alt="Profile Picture"
                  height={4000}
                  width={3000}
