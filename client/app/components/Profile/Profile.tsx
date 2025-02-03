@@ -39,9 +39,9 @@ const Profile: FC<Props> = ({ user }) => {
   }, [user]); // Re-run when user changes
 
   return (
-    <div className="w-[85%] flex mx-auto  ">
+    <div className="flex mx-auto  ">
   
-        <div className="w-full h-full bg-transparent mt-[80px]">
+        <div className="w-full h-full bg-transparent  ">
           <ProfileInfo avatar={avatar} user={user} />
         </div>
   

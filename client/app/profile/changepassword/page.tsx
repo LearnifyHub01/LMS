@@ -27,7 +27,6 @@ const Page: FC<Props> = () => { // Corrected component name to start with upperc
           keywords="programming,MERN"
         />
         <Header
-          setActiveItem={setActiveItem}
           open={open}
           setOpen={setOpen}
           activeItem={activeItem}

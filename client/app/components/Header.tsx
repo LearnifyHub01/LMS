@@ -21,6 +21,7 @@ type Props = {
   activeItem: number;
   route: string;
   setRoute: (route: string) => void;
+ 
 };
 
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
@@ -127,7 +128,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               {user ? (
                 <Link href={"/profile"}>
                   <Image
-                    src={user?.avatar?.url}
+                    src={user?.avatar?.url ||avatar}
                     alt="Profile Picture"
                     height={4000}
                     width={3000}

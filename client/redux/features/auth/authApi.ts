@@ -98,7 +98,7 @@ export const authApi = apiSlice.injectEndpoints({
     }),
     logOut: builder.query({
       query: () => ({
-        url: "logout",
+        url: "logout-from-all",
         method: "GET",
         credentials: "include" as const,
       }),

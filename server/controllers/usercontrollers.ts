@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import userModel, { IUser } from "../models/user.model";
+import userModel, { IUser,ISession } from "../models/user.model";
 import ErrorHandler from "../utils/ErrorHandler";
 import { CatchAsyncError } from "./../middleware/catchAsyncErrors";
 import jwt, { Secret, JwtPayload } from "jsonwebtoken";
@@ -8,6 +8,7 @@ import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
 import { redis } from "../utils/redis";
+import sendSessionMail from "../utils/sendSessionMail";
 import {
   sendToken,
   accessTokenOptions,
@@ -15,6 +16,9 @@ import {
 } from "../utils/jwt";
 import { getUserbyId } from "../services/user.service";
 import cloudinary from "cloudinary";
+import { Session } from "inspector/promises";
+const uaParser = require("ua-parser-js");
+
 
 //register user
 
@@ -163,6 +167,7 @@ export const activateUser = CatchAsyncError(
 interface ILoginRequest {
   email: string;
   password: string;
+  
 }
 
 export const loginUser = CatchAsyncError(
@@ -188,19 +193,42 @@ export const loginUser = CatchAsyncError(
           )
         );
       }
+      
+      const userAgent = uaParser(req.headers["user-agent"]);
+      const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP";
+      sendToken(user, 200, res,userAgent,ipAddress);
+      const data = { 
+        user: { name: user.name }, 
+        userAgent, 
+        ipAddress, 
+        loginTime: new Date() 
+      };
 
-      sendToken(user, 200, res);
+      await sendSessionMail({
+        email: user.email,
+        subject: "New Session Detected",
+        data,  // No need to include `templet`
+      });
+
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
 
-//logout user
+//logout one user
 
 export const logoutUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // Get the refresh token and session ID from cookies
+      const refreshToken = req.cookies.refresh_token;
+      const sessionId = req.cookies.session_id;
+
+      if (!refreshToken || !sessionId) {
+        return next(new ErrorHandler("Refresh token or session ID missing", 400));
+      }
+
       // Clear cookies
       res.clearCookie("access_token", {
         httpOnly: true,
@@ -212,12 +240,36 @@ export const logoutUser = CatchAsyncError(
         sameSite: "lax",
         expires: new Date(0),
       });
+      res.clearCookie("session_id", {
+        httpOnly: true,
+        sameSite: "lax",
+        expires: new Date(0),
+      });
 
       // Clear the session from Redis
       const userId = req.user?._id;
-      if (userId) {
-        await redis.del(userId.toString()); // Remove session from Redis
+
+      if (!userId) {
+        return next(new ErrorHandler("User not authenticated", 401));
       }
+
+      // Get the user and remove their session
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+
+      // Build the session key based on session ID
+      const sessionKey = `session:${userId}:${sessionId}`;
+
+      // Delete the session from Redis
+      await redis.del(sessionKey); // Remove session from Redis using sessionKey
+
+      // Remove the session from the user's session array
+      user.sessions = user.sessions.filter(
+        (session: any) => session.refreshToken !== refreshToken
+      );
+      await user.save();
 
       res.status(200).json({
         success: true,
@@ -229,68 +281,225 @@ export const logoutUser = CatchAsyncError(
   }
 );
 
+
+//log out from all device
+
+export const logoutFromAllDevice = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id;
+
+      if (!userId) {
+        return next(new ErrorHandler("User not authenticated", 401));
+      }
+
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+
+      // Clear all sessions for the user from Redis
+      const keys = await redis.keys(`session:${userId}:*`);  // Get all session keys for this user
+      if (keys.length > 0) {
+        await redis.del(...keys);  // Delete all sessions from Redis
+      }
+
+      // Clear cookies
+      res.clearCookie("access_token", {
+        httpOnly: true,
+        sameSite: "lax",
+        expires: new Date(0),
+      });
+      res.clearCookie("refresh_token", {
+        httpOnly: true,
+        sameSite: "lax",
+        expires: new Date(0),
+      });
+      res.clearCookie("session_id", {
+        httpOnly: true,
+        sameSite: "lax",
+        expires: new Date(0),
+      });
+      user.sessions = []
+      
+      
+      await user.save()
+      res.status(200).json({ 
+        success:true,
+        message: "Logged out from all devices" });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 //update new access token
 
+// export const updateAccessToken = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const refresh_token = req.cookies.refresh_token as string;
+  
+
+//       // Debugging: Log received refresh token
+//       console.log("Received refresh_token:", refresh_token);
+
+//       if (!refresh_token) {
+//         return next(new ErrorHandler("JWT must be provided", 400));
+//       }
+
+//       let decoded;
+//       try {
+//         decoded = jwt.verify(
+//           refresh_token,
+//           process.env.REFRESH_TOKEN as string
+//         ) as JwtPayload;
+//         console.log("Decoded refresh token:", decoded);
+//       } catch (err) {
+//         console.error("Error verifying refresh token:", err);
+//         return next(new ErrorHandler("Invalid or expired refresh token", 400));
+//       }
+
+//       const session = await redis.get(decoded.id as string);
+
+//       // Debugging: Log session from Redis
+//       console.log("Session data from Redis:", session);
+
+//       if (!session) {
+//         return next(new ErrorHandler("Session not found or expired", 400));
+//       }
+//       const user = await userModel.findById(decoded.id)
+//       if (!user) {
+//         return next(new ErrorHandler("User not found", 404));
+//       }
+
+      
+
+//       const accessToken = jwt.sign(
+//         { id: user._id },
+//         process.env.ACCESS_TOKEN as string,
+//         { expiresIn: "1d" }
+//       );
+
+//       const newRefreshToken = jwt.sign(
+//         { id: user._id },
+//         process.env.REFRESH_TOKEN as string,
+//         { expiresIn: "10d" }
+//       );
+//       req.user = user;
+     
+//       res.cookie("access_token", accessToken, accessTokenOptions);
+//       res.cookie("refresh_token", newRefreshToken, refreshTokenOptions);
+
+//       user.sessions = user.sessions.filter((session:any) => session.refreshToken !== refresh_token);
+
+//       const userAgent = uaParser(req.headers["user-agent"]);
+//       const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP";
+//       user.sessions.push({
+//         refreshToken : newRefreshToken,
+//         ipAddress : ipAddress,
+//         device: userAgent.ua,
+//         loginTime: new Date(),
+//     } as ISession);
+//     await user.save();
+//       await user.save();
+
+//       res.status(200).json({
+//         status: "success",
+//         accessToken,
+//       });
+//     } catch (error: any) {
+//       console.error("Error during token refresh:", error);
+//       return next(new ErrorHandler(error.message, 400));
+//     }
+//   }
+// );
 export const updateAccessToken = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const refresh_token = req.cookies.refresh_token as string;
+      const sessionId = req.cookies.session_id; // Get session ID from cookie
 
-      // Debugging: Log received refresh token
-      console.log("Received refresh_token:", refresh_token);
-
-      if (!refresh_token) {
-        return next(new ErrorHandler("JWT must be provided", 400));
+      if (!refresh_token || !sessionId) {
+        return next(new ErrorHandler("JWT and Session ID must be provided", 400));
       }
 
-      let decoded;
+      console.log("Received refresh_token:", refresh_token);
+
+      // Decode the refresh token to get the user ID
+      let decoded: any;
       try {
-        decoded = jwt.verify(
-          refresh_token,
-          process.env.REFRESH_TOKEN as string
-        ) as JwtPayload;
+        decoded = jwt.verify(refresh_token, process.env.REFRESH_TOKEN as string) as JwtPayload;
         console.log("Decoded refresh token:", decoded);
       } catch (err) {
         console.error("Error verifying refresh token:", err);
         return next(new ErrorHandler("Invalid or expired refresh token", 400));
       }
 
-      const session = await redis.get(decoded.id as string);
+      const userId = decoded.id;
+      const user = await userModel.findById(userId);
 
-      // Debugging: Log session from Redis
-      console.log("Session data from Redis:", session);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
 
-      if (!session) {
+      // 1️⃣ Get session from Redis using session key
+      const sessionKey = `session:${userId}:${sessionId}`;
+      const sessionJson = await redis.get(sessionKey);
+
+      console.log("Session data from Redis:", sessionJson);
+
+      if (!sessionJson) {
         return next(new ErrorHandler("Session not found or expired", 400));
       }
 
-      const user = JSON.parse(session);
+      const sessionData = JSON.parse(sessionJson);
 
-      const accessToken = jwt.sign(
-        { id: user._id },
-        process.env.ACCESS_TOKEN as string,
-        { expiresIn: "1d" }
-      );
+      // 2️⃣ Check if refresh token matches the stored session
+      if (sessionData.refreshToken !== refresh_token) {
+        return next(new ErrorHandler("Invalid refresh token", 400));
+      }
 
-      const refreshToken = jwt.sign(
-        { id: user._id },
-        process.env.REFRESH_TOKEN as string,
-        { expiresIn: "10d" }
-      );
-      req.user = user;
+      console.log("Valid session found:", sessionData);
+
+      // 3️⃣ Generate new tokens
+      const accessToken = jwt.sign({ id: userId }, process.env.ACCESS_TOKEN as string, { expiresIn: "1d" });
+      const newRefreshToken = jwt.sign({ id: userId }, process.env.REFRESH_TOKEN as string, { expiresIn: "10d" });
+
       res.cookie("access_token", accessToken, accessTokenOptions);
-      res.cookie("refresh_token", refreshToken, refreshTokenOptions);
+      res.cookie("refresh_token", newRefreshToken, refreshTokenOptions);
+
+      // 4️⃣ Remove old refresh token from user's sessions
+      user.sessions = user.sessions.filter((session: any) => session.refreshToken !== refresh_token);
+
+      // 5️⃣ Update session in Redis with the new refresh token
+      sessionData.refreshToken = newRefreshToken;
+      await redis.set(sessionKey, JSON.stringify(sessionData));
+
+      // 6️⃣ Save the new session in MongoDB
+      const userAgent = uaParser(req.headers["user-agent"]);
+      const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP";
+      user.sessions.push({
+        refreshToken: newRefreshToken,
+        ipAddress: ipAddress,
+        device: userAgent.ua,
+        loginTime: new Date(),
+      } as ISession);
+
+      await user.save();
 
       res.status(200).json({
         status: "success",
         accessToken,
       });
+
     } catch (error: any) {
       console.error("Error during token refresh:", error);
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
+
 
 // get user info
 
@@ -304,6 +513,8 @@ export const getUserInfo = CatchAsyncError(
     }
   }
 );
+
+
 
 //social authentication
 interface ISocialAuthBody {
@@ -321,7 +532,9 @@ export const socialAuth = CatchAsyncError(
         public_id: "defaultPublicId",
         url: avatar,
       };
-
+      const userAgent = uaParser(req.headers["user-agent"]);
+      const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP";
+      
       const user = await userModel.findOne({ email });
       if (!user) {
         const newUser = await userModel.create({
@@ -329,9 +542,10 @@ export const socialAuth = CatchAsyncError(
           name,
           avatar: avatarObject,
         });
-        sendToken(newUser, 200, res);
+        sendToken(newUser, 200, res,userAgent,ipAddress);
+        
       } else {
-        sendToken(user, 200, res);
+        sendToken(user, 200, res,userAgent,ipAddress);
       }
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));

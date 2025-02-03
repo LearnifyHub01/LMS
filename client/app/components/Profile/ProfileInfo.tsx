@@ -1,145 +1,245 @@
+// "use client";
 // import React, { FC, useEffect, useState } from "react";
 // import Image from "next/image";
-// import avatarPlaceholder from "../../../public/assests/download5.png";
 // import { AiOutlineCamera } from "react-icons/ai";
+// import { FiEdit3 } from "react-icons/fi";
+// import avtarIcon from "../../../public/assests/download5.png";
 // import { useEditProfileMutation, useUpdateAvatarMutation } from "@/redux/features/user/userApi";
 // import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 // import toast from "react-hot-toast";
 
-// interface Props {
+// type Props = {
 //   avatar: string | null;
 //   user: any;
-// }
+// };
 
 // const ProfileInfo: FC<Props> = ({ avatar, user }) => {
 //   const [name, setName] = useState(user?.name || "");
 //   const [editProfile, { isSuccess, error }] = useEditProfileMutation();
-//   const [updateAvatar, { isSuccess: avatarSuccess, error: avatarError }] = useUpdateAvatarMutation();
+//   const [updateAvatar, { isSuccess: success, error: updateError }] = useUpdateAvatarMutation();
 //   const [loadUser, setLoadUser] = useState(false);
 
-//   useLoadUserQuery(undefined, { skip: !loadUser });
+//   const {} = useLoadUserQuery(undefined, { skip: loadUser ? false : true });
 
-//   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = e.target.files?.[0];
+//   const imageHandler = async (e: any) => {
+//     const file = e.target.files[0];
 //     if (!file) return;
 
 //     const fileReader = new FileReader();
-//     fileReader.readAsDataURL(file);
-
-//     fileReader.onload = async () => {
+//     fileReader.onload = () => {
 //       if (fileReader.readyState === 2) {
-//         const avatar = fileReader.result as string;
-//         updateAvatar({ avatar });
+//         const avatar = fileReader.result;
+//         updateAvatar(avatar);
 //       }
 //     };
+//     fileReader.readAsDataURL(file);
 //   };
 
 //   useEffect(() => {
-//     if (isSuccess || avatarSuccess) {
+//     if (isSuccess || success) {
 //       setLoadUser(true);
 //       toast.success("Profile Updated Successfully!");
 //     }
-//     if (error || avatarError) {
-//       console.error(error || avatarError);
-//       toast.error("Something went wrong!");
-//     }
-//   }, [isSuccess, avatarSuccess, error, avatarError]);
+//   }, [isSuccess, success]);
 
-//   const handleSubmit = async (e: React.FormEvent) => {
+//   const handleSubmit = async (e: any) => {
 //     e.preventDefault();
-//     if (name.trim()) {
+//     if (name !== "") {
 //       await editProfile({ name });
 //     }
 //   };
 
 //   return (
-//     <div className="w-full flex flex-col items-center bg-white dark:bg-gray-900 p-10 rounded-xl shadow-lg max-w-lg mx-auto">
-//       {/* Avatar Section */}
-//       <div className="relative mb-6">
+//     <div className="flex min-h-screen bg-gradient-to-r from-[#f3f4f6] to-[#e5e7eb] dark:from-[#111827] dark:to-[#1f2937]">
+//       {/* Profile Card */}
+//       <div className="w-[420px] bg-white dark:bg-[#1e1e2e] shadow-lg rounded-lg p-6 text-center border border-gray-200 dark:border-gray-800">
+//         {/* Avatar Section */}
+//         <div className="relative w-32 h-32 mx-auto">
+//           <Image
+//             src={user?.avatar?.url || avtarIcon}
+//             alt="Profile Picture"
+//             width={500}
+//             height={500}
+//             className="w-32 h-32 object-cover border-4 border-[#37a39a] rounded-full shadow-md"
+//           />
+//           {/* Avatar Upload Button */}
+//           <label htmlFor="avatar">
+//             <div className="absolute bottom-2 right-2 w-8 h-8 bg-[#37a39a] rounded-full flex items-center justify-center cursor-pointer shadow-md hover:scale-110 transition">
+//               <AiOutlineCamera size={18} className="text-white" />
+//             </div>
+//           </label>
+//           <input type="file" id="avatar" className="hidden" onChange={imageHandler} accept="image/*" />
+//         </div>
 
-//         <Image
-//           src={user?.avatar?.url || avatar || avatarPlaceholder}
-//           alt="Profile Avatar"
-//           height={130}
-//           width={130}
-//           className="w-[130px] h-[130px] rounded-full border-4 border-[#37a39a] shadow-xl hover:scale-110 transition-transform"
+//         {/* Profile Information */}
+//         <h2 className="mt-4 text-2xl font-semibold text-gray-800 dark:text-white">{user?.name || "User Name"}</h2>
+//         <p className="text-gray-500 dark:text-gray-300 text-sm">{user?.email || "email@example.com"}</p>
 
-//         />
-
-//         <input
-//           type="file"
-//           id="avatarUpload"
-//           className="hidden"
-//           onChange={handleImageUpload}
-//           accept="image/png,image/jpeg,image/jpg,image/webp"
-//         />
-//         <label htmlFor="avatarUpload">
-//           <div className="w-9 h-9 bg-[#37a39a] rounded-full absolute bottom-2 right-2 flex items-center justify-center cursor-pointer shadow-md hover:bg-[#2d8f7b] transition">
-//             <AiOutlineCamera size={22} className="text-white" />
-//           </div>
-//         </label>
-//       </div>
-
-//       {/* Profile Form Section */}
-//       <div className="w-full px-6 py-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-//         <form onSubmit={handleSubmit} className="space-y-6">
+//         {/* Edit Profile Form */}
+//         <form onSubmit={handleSubmit} className="mt-6">
 //           {/* Full Name Field */}
-//           <div>
-//             <label className="block text-lg font-semibold text-gray-700 dark:text-white mb-2">
-//               Full Name
-//             </label>
+//           <div className="relative">
 //             <input
 //               type="text"
-//               className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#37a39a] dark:bg-gray-700 dark:text-white dark:border-gray-600"
+//               className="w-full bg-gray-100 dark:bg-[#27293d] border border-gray-300 dark:border-gray-700 rounded-md p-3 text-gray-700 dark:text-white focus:ring-2 focus:ring-[#37a39a] transition"
 //               required
 //               value={name}
 //               onChange={(e) => setName(e.target.value)}
+//               placeholder="Your Full Name"
 //             />
-//           </div>
-
-//           {/* Email Field */}
-//           <div>
-//             <label className="block text-lg font-semibold text-gray-700 dark:text-white mb-2">
-//               Email Address
-//             </label>
-//             <input
-//               type="text"
-//               className="w-full p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed dark:bg-gray-700 dark:text-white dark:border-gray-600"
-//               readOnly
-//               required
-//               value={user?.email}
-//             />
+//             <FiEdit3 className="absolute right-4 top-4 text-gray-500" />
 //           </div>
 
 //           {/* Submit Button */}
-//           <div className="flex justify-center mt-6">
-//             <button
-//               className="w-full sm:w-48 h-12 bg-[#37a39a] text-white rounded-lg text-lg font-semibold cursor-pointer transition-all hover:bg-[#2d8f7b] shadow-md focus:outline-none"
-//               type="submit"
-//             >
-//               Update Profile
-//             </button>
-//           </div>
+//           <button
+//             type="submit"
+//             className="mt-5 w-full bg-[#37a39a] text-white py-3 rounded-md hover:bg-[#2b8277] transition shadow-lg"
+//           >
+//             Update Profile
+//           </button>
 //         </form>
 //       </div>
 //     </div>
+//   );
+// };
+
+// export default ProfileInfo;
+
+
+// "use client";
+// import React, { FC, useEffect, useState } from "react";
+// import Image from "next/image";
+// import { AiOutlineCamera } from "react-icons/ai";
+// import { FiEdit3 } from "react-icons/fi";
+// import avtarIcon from "../../../public/assests/download5.png";
+// import { useEditProfileMutation, useUpdateAvatarMutation } from "@/redux/features/user/userApi";
+// import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
+// import toast from "react-hot-toast";
+
+// type Props = {
+//   avatar: string | null;
+//   user: any;
+// };
+
+// const ProfileInfo: FC<Props> = ({ avatar, user }) => {
+//   const [name, setName] = useState(user?.name || "");
+//   const [editProfile, { isSuccess, error }] = useEditProfileMutation();
+//   const [updateAvatar, { isSuccess: success, error: updateError }] = useUpdateAvatarMutation();
+//   const [loadUser, setLoadUser] = useState(false);
+//   useLoadUserQuery(undefined, { skip: !loadUser });
+
+//   const imageHandler = async (e: any) => {
+//     const file = e.target.files[0];
+//     if (!file) return;
+
+//     const fileReader = new FileReader();
+//     fileReader.onload = () => {
+//       if (fileReader.readyState === 2) {
+//         updateAvatar(fileReader.result);
+//       }
+//     };
+//     fileReader.readAsDataURL(file);
+//   };
+
+//   useEffect(() => {
+//     if (isSuccess || success) {
+//       setLoadUser(true);
+//       toast.success("Profile Updated Successfully!");
+//     }
+//   }, [isSuccess, success]);
+
+//   const handleSubmit = async (e: any) => {
+//     e.preventDefault();
+//     if (name !== "") {
+//       await editProfile({ name });
+//     }
+//   };
+
+//   return (
+// <div className="flex flex-col min-h-screen bg-gradient-to-r from-[#f3f4f6] to-[#e5e7eb] dark:from-[#111827] dark:to-[#1f2937] px-6 overflow-hidden">
+  
+//   <div className="flex flex-col md:flex-row gap-6 md:gap-2 max-w-full w-full py-6 md:py-10 flex-1 overflow-hidden">
+    
+//     {/* Left Side: Profile Card */}
+//     <div className="w-full md:w-1/3 bg-white dark:bg-[#1e1e2e] shadow-lg rounded-lg p-6 text-center border border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center space-y-4">
+      
+//       {/* Avatar Section */}
+//       <div className="relative w-32 h-32 mx-auto mt-6">
+//         <Image
+//           src={user?.avatar?.url || avtarIcon}
+//           alt="Profile Picture"
+//           width={500}
+//           height={500}
+//           className="w-full h-full object-cover border-4 border-[#37a39a] rounded-full shadow-md"
+//         />
+//         {/* Avatar Upload Button */}
+//         <label htmlFor="avatar">
+//           <div className="absolute bottom-2 right-2 w-8 h-8 bg-[#37a39a] rounded-full flex items-center justify-center cursor-pointer shadow-md hover:scale-110 transition">
+//             <AiOutlineCamera size={18} className="text-white" />
+//           </div>
+//         </label>
+//         <input type="file" id="avatar" className="hidden" onChange={imageHandler} accept="image/*" />
+//       </div>
+      
+//       {/* Profile Information */}
+//       <div className="text-center space-y-2">
+//         <h2 className="text-xl md:text-2xl font-semibold text-gray-800 dark:text-white">
+//           {user?.name ? user?.name.split(' ').map((word: any) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : "User Name"}
+//         </h2>
+//         <p className="text-gray-500 dark:text-gray-300 text-sm md:text-base">{user?.email || "email@example.com"}</p>
+//       </div>
+//     </div>
+
+//     {/* Right Side: Edit Profile Form */}
+//     <div className="bg-gray-100 dark:bg-[#2a2e38] shadow-lg rounded-lg p-6 border border-gray-300 dark:border-gray-700 w-full md:w-2/3 flex-1 overflow-auto">
+      
+//       <h3 className="text-lg md:text-xl font-semibold text-gray-700 dark:text-white mb-4 text-center">Edit Profile</h3>
+//       <form onSubmit={handleSubmit} className="space-y-4">
+        
+//         {/* Full Name Field */}
+//         <div className="relative">
+//           <label className="block text-gray-700 dark:text-white mb-1">Full Name</label>
+//           <input
+//             type="text"
+//             className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-700 rounded-md p-3 text-gray-700 dark:text-white focus:ring-2 focus:ring-[#37a39a] transition"
+//             required
+//             value={name}
+//             onChange={(e) => setName(e.target.value)}
+//             placeholder="Your Full Name"
+//           />
+//           <FiEdit3 className="absolute right-4 top-10 md:top-11 text-gray-500" />
+//         </div>
+
+//         {/* Submit Button */}
+//         <button
+//           type="submit"
+//           className="w-full bg-[#37a39a] text-white py-3 rounded-md hover:bg-[#2b8277] transition shadow-lg"
+//         >
+//           Update Profile
+//         </button>
+//       </form>
+//     </div>
+
+//   </div>
+// </div>
+
+
 
 //   );
 // };
 
 // export default ProfileInfo;
+
 "use client";
 import React, { FC, useEffect, useState } from "react";
 import Image from "next/image";
-import avtarIcon from "../../../public/assests/download5.png";
 import { AiOutlineCamera } from "react-icons/ai";
-import { styles } from "@/app/styles/style";
-import {
-  useEditProfileMutation,
-  useUpdateAvatarMutation,
-} from "@/redux/features/user/userApi";
+import { FiEdit3 } from "react-icons/fi";
+import avtarIcon from "../../../public/assests/download5.png";
+import { useEditProfileMutation, useUpdateAvatarMutation } from "@/redux/features/user/userApi";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa"; // or you can use a different spinner component
 
 type Props = {
   avatar: string | null;
@@ -149,25 +249,19 @@ type Props = {
 const ProfileInfo: FC<Props> = ({ avatar, user }) => {
   const [name, setName] = useState(user?.name || "");
   const [editProfile, { isSuccess, error }] = useEditProfileMutation();
-  const [updateAvatar, { isSuccess: success, error: updateError }] =
-    useUpdateAvatarMutation();
+  const [updateAvatar, { isSuccess: success, error: updateError }] = useUpdateAvatarMutation();
   const [loadUser, setLoadUser] = useState(false);
-  const {} = useLoadUserQuery(undefined, {
-    skip: loadUser ? false : true,
-  });
+  const [isLoading, setIsLoading] = useState(false); // Loader state
+  useLoadUserQuery(undefined, { skip: !loadUser });
 
   const imageHandler = async (e: any) => {
-    const file = e.target.files[0]; // Correct property access
-    if (!file) {
-      console.log("No file selected");
-      return;
-    }
+    const file = e.target.files[0];
+    if (!file) return;
 
     const fileReader = new FileReader();
     fileReader.onload = () => {
       if (fileReader.readyState === 2) {
-        const avatar = fileReader.result;
-        updateAvatar(avatar); // Pass the avatar to the mutation
+        updateAvatar(fileReader.result);
       }
     };
     fileReader.readAsDataURL(file);
@@ -176,93 +270,89 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
   useEffect(() => {
     if (isSuccess || success) {
       setLoadUser(true);
-    }
-    if (error || updateError) {
-      console.log(error);
-    }
-    if (isSuccess) {
       toast.success("Profile Updated Successfully!");
+      setIsLoading(false); // Stop loading when profile is updated
     }
-  }, [isSuccess, error, success, updateError]);
+  }, [isSuccess, success]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (name !== "") {
-      await editProfile({
-        name: name,
-      });
+      setIsLoading(true); // Start loading when the form is submitted
+      await editProfile({ name });
     }
-    console.log(user?.url);
   };
 
   return (
-    <div className="w-full flex flex-col items-center p-10">
-      {/* Avatar Section */}
-      <div className="relative">
-        <Image
-          src={user?.avatar?.url}
-          alt="Profile Picture"
-          height={4000}
-          width={3000}
-          className="w-[150px] h-[150px] cursor-pointer border-[3px] border-[#37a39a] rounded-full object-cover"
-        />
-
-        <input
-          type="file"
-          id="avatar"
-          className="hidden"
-          onChange={imageHandler}
-          accept="image/png,image/jpeg,image/jpg,image/webp"
-        />
-        <label htmlFor="avatar">
-          <div className="w-[30px] h-[30px] bg-slate-900 rounded-full absolute bottom-2 right-2 flex items-center justify-center cursor-pointer">
-            <AiOutlineCamera size={20} className="text-white" />
+    <div className="flex flex-col min-h-screen bg-gradient-to-r from-[#f3f4f6] to-[#e5e7eb] dark:from-[#111827] dark:to-[#1f2937] px-6 overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-6 md:gap-2 max-w-full w-full py-6 md:py-10 flex-1 overflow-hidden">
+        
+        {/* Left Side: Profile Card */}
+        <div className="w-full md:w-1/3 bg-white dark:bg-[#1e1e2e] shadow-lg rounded-lg p-6 text-center border border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center space-y-4">
+          
+          {/* Avatar Section */}
+          <div className="relative w-32 h-32 mx-auto mt-6">
+            <Image
+              src={user?.avatar?.url || avtarIcon}
+              alt="Profile Picture"
+              width={500}
+              height={500}
+              className="w-full h-full object-cover border-4 border-[#37a39a] rounded-full shadow-md"
+            />
+            {/* Avatar Upload Button */}
+            <label htmlFor="avatar">
+              <div className="absolute bottom-2 right-2 w-8 h-8 bg-[#37a39a] rounded-full flex items-center justify-center cursor-pointer shadow-md hover:scale-110 transition">
+                <AiOutlineCamera size={18} className="text-white" />
+              </div>
+            </label>
+            <input type="file" id="avatar" className="hidden" onChange={imageHandler} accept="image/*" />
           </div>
-        </label>
-      </div>
+          
+          {/* Profile Information */}
+          <div className="text-center space-y-2">
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-800 dark:text-white">
+              {user?.name ? user?.name.split(' ').map((word: any) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : "User Name"}
+            </h2>
+            <p className="text-gray-500 dark:text-gray-300 text-sm md:text-base">{user?.email || "email@example.com"}</p>
+          </div>
+        </div>
 
-      {/* Profile Form Section */}
-      <div className="w-full px-6 800px:px-10 mt-6">
-        <form onSubmit={handleSubmit}>
-          <div className="800px:w-[50%] m-auto block pb-4">
+        {/* Right Side: Edit Profile Form */}
+        <div className="bg-gray-100 dark:bg-[#2a2e38] shadow-lg rounded-lg p-6 border border-gray-300 dark:border-gray-700 w-full md:w-2/3 flex-1 overflow-auto">
+          
+          <h3 className="text-lg md:text-xl font-semibold text-gray-700 dark:text-white mb-4 text-center">Edit Profile</h3>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            
             {/* Full Name Field */}
-            <div className="w-full">
-              <label className="block pb-2 text-black dark:text-white">
-                Full Name
-              </label>
+            <div className="relative">
+              <label className="block text-gray-700 dark:text-white mb-1">Full Name</label>
               <input
                 type="text"
-                className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
+                className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-700 rounded-md p-3 text-gray-700 dark:text-white focus:ring-2 focus:ring-[#37a39a] transition"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                placeholder="Your Full Name"
               />
-            </div>
-
-            {/* Email Field */}
-            <div className="w-full pt-2">
-              <label className="block pb-2 text-black dark:text-white">
-                Email Address
-              </label>
-              <input
-                type="text"
-                className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
-                readOnly
-                required
-                value={user?.email}
-              />
+              <FiEdit3 className="absolute right-4 top-10 md:top-11 text-gray-500" />
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-center items-center mt-8">
-              <input
-                className="mx-auto block w-[250px] h-[40px] border border-[#37a39a] text-center dark:text-[#fff] text-black rounded-[3px] mt-8 cursor-pointer"
-                type="submit"
-                value="Update"
-              />
-            </div>
-          </div>
-        </form>
+            <button
+              type="submit"
+              className="w-full bg-[#37a39a] text-white py-3 rounded-md hover:bg-[#2b8277] transition shadow-lg"
+            >
+              {isLoading ? (
+                <div className="flex justify-center items-center">
+                  <FaSpinner className="animate-spin text-white" size={20} />
+                </div>
+              ) : (
+                "Update Profile"
+              )}
+            </button>
+          </form>
+        </div>
+
       </div>
     </div>
   );

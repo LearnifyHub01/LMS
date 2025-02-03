@@ -2,10 +2,24 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 require('dotenv').config()
 import jwt from 'jsonwebtoken';
+import { Session } from "inspector/promises";
 
 const emailRegexPattern: RegExp =
   /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+  export interface ISession extends Document {
+    refreshToken:string,
+    ipAddress:string,
+    device:string,
+    loginTime:Date
+  }
+  
+  const SessionSchema : Schema<ISession> =new mongoose.Schema({
+    refreshToken: { type: String, required: true },
+    ipAddress: { type: String, required: true },
+    device: { type: String, required: true },
+    loginTime: { type: Date, default: Date.now }
+  })
 export interface IUser extends Document {
   _id:string
   name: string;
@@ -19,6 +33,7 @@ export interface IUser extends Document {
   role: string;
   isVerified: boolean;
   courses: Array<{ courseId: string }>;
+  sessions: ISession[]
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: ()=>string;
   SignRefreshToken:()=>string
@@ -58,6 +73,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    sessions: [SessionSchema],
     courses: [
       {
         courseId: String,
@@ -66,6 +82,8 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+
 
 //Hash Password before saving
 userSchema.pre<IUser>("save", async function (next) {
@@ -103,3 +121,6 @@ userSchema.methods.comparePassword = async function (
 
 const userModel: Model<IUser> = mongoose.model("user", userSchema);
 export default userModel;
+
+
+
