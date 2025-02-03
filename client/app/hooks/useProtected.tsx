@@ -1,14 +1,20 @@
-'use client'
+"use client";
 import { redirect } from "next/navigation";
-import userAuth from "./useAuth";
+import useAuth from "./useAuth";
 import React from "react";
 
 interface ProtectedProps {
-  children: React.ReactNode; // Correct spelling of 'children'
+  children: React.ReactNode;
 }
 
 export default function Protected({ children }: ProtectedProps) {
-  const isAuthenticated = userAuth();
+  const isAuthenticated = useAuth();
 
-  return isAuthenticated ? children : redirect('/');
+  if (!isAuthenticated) {
+    redirect("/");
+    return null; // Avoid rendering anything while redirecting
+  }
+
+  return <>{children}</>;
 }
+

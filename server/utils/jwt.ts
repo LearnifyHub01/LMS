@@ -21,14 +21,16 @@ export const accessTokenOptions : ITokenOptions ={
     expire : new Date(Date.now()+ accessTokenExpire*60*60 *1000),
     maxAge:accessTokenExpire *60*60*1000,
     httpOnly:true,
-    sameSite:'lax'
+    sameSite:'lax',
+    secure: process.env.NODE_ENV === 'production',
 }
 
 export const refreshTokenOptions : ITokenOptions ={
     expire : new Date(Date.now()+ refreshTokenExpire *24*60*60*1000),
     maxAge:refreshTokenExpire *24*60*60*1000,
     httpOnly:true,
-    sameSite:'lax'
+    sameSite:'lax',
+    secure: process.env.NODE_ENV === 'production',
 }
 // export const sendToken = async (user:IUser,statusCode:number,res:Response,userAgent:any,ipAddress:string) =>{
 //     const accessToken =user.SignAccessToken()
@@ -91,6 +93,8 @@ export const sendToken = async (user:IUser,statusCode:number,res:Response,userAg
     // upload session to redis
 
     const sessionId = uuidv4();  // Generate unique session ID
+    const sessionKey = `session:${user._id}:${sessionId}`;
+    
 
     // Create session data
     const sessionData = {
@@ -103,12 +107,16 @@ export const sendToken = async (user:IUser,statusCode:number,res:Response,userAg
       },
       refreshToken,
       ipAddress,
-      device: userAgent.ua,
+      device: userAgent.device,
+      browser:userAgent.browser,
+      os:userAgent.os,
+      cpu:userAgent.cpu,
+      sessionKey:sessionKey,
       loginTime: new Date(),
     };
     
     // Store session in Redis using the session key format `session:{userId}:{sessionId}`
-    await redis.set(`session:${user._id}:${sessionId}`, JSON.stringify(sessionData));
+    await redis.set(sessionKey, JSON.stringify(sessionData));
     res.cookie('session_id', sessionId, {
         httpOnly: true,
         sameSite: 'lax',
@@ -119,19 +127,20 @@ export const sendToken = async (user:IUser,statusCode:number,res:Response,userAg
       if (process.env.NODE_ENV === 'production') {
         accessTokenOptions.secure = true;
       }
-
-    
-
     res.cookie("access_token",accessToken,accessTokenOptions)
     res.cookie('refresh_token',refreshToken,refreshTokenOptions)
 
-    
-    user.sessions.push({
-        refreshToken,
-        ipAddress,
-        device: userAgent.ua,
-        loginTime: new Date(),
-    } as ISession);
+      
+  user.sessions.push({
+    refreshToken,
+    ipAddress,
+    device: userAgent.device,
+    browser: userAgent.browser,
+    os: userAgent.os,
+    cpu: userAgent.cpu,
+    sessionKey:sessionKey,  // This is where the `sId` should be correctly assigned
+    loginTime: new Date(),
+} as ISession);
     await user.save();
 
     res.status(statusCode).json({

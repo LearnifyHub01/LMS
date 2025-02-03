@@ -5,7 +5,6 @@ import { AiFillHome } from "react-icons/ai";
 import { MdSchool } from "react-icons/md";
 import Image from "next/image";
 import { MdLiveHelp, MdGavel, MdLogout } from "react-icons/md";
-import avatarDefault from "../../public/assests/download5.png";
 import { FaInfoCircle, FaUnlockAlt, FaChalkboardTeacher } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { MdGroupAdd } from "react-icons/md";
@@ -51,7 +50,7 @@ const NavItems: React.FC<Props> = ({
     setOpen(true);
   };
   const logOutHandler = async () => {
-    await signOut();
+    await signOut({redirect:false});
     setLogout(true);
     redirect('/')
   };
@@ -174,7 +173,7 @@ const NavItems: React.FC<Props> = ({
                   </li>
                   </Link>
                 
-                  <Link href="/profile/changepassword">
+                  <Link href="/profile/sessioninformation">
                   <li
                     className={`${
                       activeItem === 2
@@ -184,6 +183,18 @@ const NavItems: React.FC<Props> = ({
                   >
                     <FaUnlockAlt size={20} className="mr-2" />
                     Change Password
+                  </li>
+                  </Link>
+                  <Link href="/profile/changepassword">
+                  <li
+                    className={`${
+                      activeItem === 2
+                        ? "text-[crimson] dark:text-[#2bd576]"
+                        : "text-black dark:text-white"
+                    } flex items-center p-2 rounded-lg cursor-pointer`}
+                  >
+                    <FaUnlockAlt size={20} className="mr-2" />
+                    sessions
                   </li>
                   </Link>
                  

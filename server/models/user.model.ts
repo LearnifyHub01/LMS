@@ -11,13 +11,21 @@ const emailRegexPattern: RegExp =
     refreshToken:string,
     ipAddress:string,
     device:string,
-    loginTime:Date
+    browser:string,
+    os:string,
+    cpu:string,
+    sessionKey:string
+    loginTime:Date,
   }
   
   const SessionSchema : Schema<ISession> =new mongoose.Schema({
     refreshToken: { type: String, required: true },
     ipAddress: { type: String, required: true },
     device: { type: String, required: true },
+    browser:{type: String, required: true },
+    os:{type: String, required: true },
+    cpu:{type: String, required: true},
+    sessionKey:{type: String, required: true},
     loginTime: { type: Date, default: Date.now }
   })
 export interface IUser extends Document {

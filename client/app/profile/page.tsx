@@ -7,6 +7,7 @@ import Header from '@/app/components/Header';
 import { useSelector } from 'react-redux'; // Corrected import (useSelector, not UseSelector)
 import { usePathname } from 'next/navigation';
 import Profile from '@/app/components/Profile/Profile';
+import SideBarProfile from '../components/Profile/SideBarProfile';
 
 type Props = {};
 
@@ -36,6 +37,7 @@ const Page: FC<Props> = () => { // Corrected component name to start with upperc
         />
         {/* Pass the `user` prop to the Profile component */}
         <Profile user={user}/>
+       
       </Protected>
     </div>
   );

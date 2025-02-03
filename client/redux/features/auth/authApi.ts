@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { userLoggedIn, userLoggedOut, userRegistration } from "./authSlice";
+import { userLoggedIn, userLoggedOut, userRegistration,userSessions } from "./authSlice";
 
 type RegistrationResponse = {
   message: string;
@@ -98,6 +98,23 @@ export const authApi = apiSlice.injectEndpoints({
     }),
     logOut: builder.query({
       query: () => ({
+        url: "logout",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          dispatch(
+            userLoggedOut()
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
+    logoutFromAll: builder.query({
+      query: () => ({
         url: "logout-from-all",
         method: "GET",
         credentials: "include" as const,
@@ -113,6 +130,22 @@ export const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
+    sessionInfo: builder.query({
+      query: () => ({
+        url: "user-sessions",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const { data } = await queryFulfilled; 
+          dispatch(userSessions(data));
+        } catch (error: any) {
+          console.error("Error fetching sessions:", error);
+        }
+      },
+    }),
   }),
 });
 
@@ -121,5 +154,7 @@ export const {
   useActivationMutation,
   useLoginMutation,
   useSocialAuthMutation,
-  useLogOutQuery
+  useLogOutQuery,
+  useLogoutFromAllQuery,
+  useSessionInfoQuery
 } = authApi;

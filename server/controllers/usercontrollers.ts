@@ -234,19 +234,22 @@ export const logoutUser = CatchAsyncError(
         httpOnly: true,
         sameSite: "lax",
         expires: new Date(0),
+        secure: process.env.NODE_ENV === 'production',
       });
       res.clearCookie("refresh_token", {
         httpOnly: true,
         sameSite: "lax",
         expires: new Date(0),
+        secure: process.env.NODE_ENV === 'production',
       });
       res.clearCookie("session_id", {
         httpOnly: true,
         sameSite: "lax",
         expires: new Date(0),
+        secure: process.env.NODE_ENV === 'production',
       });
 
-      // Clear the session from Redis
+     
       const userId = req.user?._id;
 
       if (!userId) {
@@ -282,6 +285,30 @@ export const logoutUser = CatchAsyncError(
 );
 
 
+//get session information
+export const getSessionInfo = CatchAsyncError(
+  async(req:Request,res:Response,next:NextFunction)=>{
+    try {
+      const userId = req.user?._id;
+      if(!userId){
+        return next(new ErrorHandler("User not authenticated", 401));
+      }
+      const user = await userModel.findById(userId);
+      if(!user){
+        return next(new ErrorHandler("User not found", 404));
+      }
+      const sessionInfo = user.sessions
+      res.status(200).json({
+        success:true,
+        sessionInfo
+      })
+
+    } catch (error : any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+)
+
 //log out from all device
 
 export const logoutFromAllDevice = CatchAsyncError(
@@ -309,16 +336,19 @@ export const logoutFromAllDevice = CatchAsyncError(
         httpOnly: true,
         sameSite: "lax",
         expires: new Date(0),
+        secure: process.env.NODE_ENV === 'production',
       });
       res.clearCookie("refresh_token", {
         httpOnly: true,
         sameSite: "lax",
         expires: new Date(0),
+        secure: process.env.NODE_ENV === 'production',
       });
       res.clearCookie("session_id", {
         httpOnly: true,
         sameSite: "lax",
         expires: new Date(0),
+        secure: process.env.NODE_ENV === 'production',
       });
       user.sessions = []
       
@@ -500,14 +530,52 @@ export const updateAccessToken = CatchAsyncError(
   }
 );
 
+//getcurrent cookie
+export const getCurrentCookie = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Get cookies from request
+      const cookies = req.cookies;
+
+      // Extract specific cookies (example: session_id, access_token)
+      const sessionId = cookies.session_id || null;
+      const accessToken = cookies.access_token || null;
+      const refreshToken = cookies.refresh_token || null;
+
+      // Check if cookies exist
+      if (!sessionId) {
+        return next(new ErrorHandler("Session ID not found", 404));
+      }
+
+      // Send cookies back in response
+      res.status(200).json({
+        success: true,
+        message: "Cookies retrieved successfully",
+        sessionId,
+        accessToken,
+        refreshToken,
+      });
+
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 
 // get user info
-
 export const getUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?._id || "";
-      getUserbyId(userId, res);
+      if (!userId) {
+        return next(new ErrorHandler("User ID not found", 404));
+      }
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+      res.status(200).json({ user });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }

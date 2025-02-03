@@ -8,7 +8,9 @@ import { registrationUser,
     getUserInfo,socialAuth, 
     UpdateUserInfo, 
     updatePassword, 
-    updateProfilePicture
+    updateProfilePicture,
+    getSessionInfo,
+    getCurrentCookie
 } from '../controllers/usercontrollers'
 import {isAuthenticated} from '../middleware/auth'
 const userRouter = express.Router()
@@ -18,6 +20,8 @@ userRouter.post('/activate-user',activateUser)
 userRouter.post('/login',loginUser)
 userRouter.get('/logout',isAuthenticated,logoutUser)
 userRouter.get('/logout-from-all',isAuthenticated,logoutFromAllDevice)
+userRouter.get('/user-sessions',isAuthenticated,getSessionInfo)
+userRouter.get('/get-current-cookie',isAuthenticated,getCurrentCookie)
 userRouter.get('/refresh',updateAccessToken)
 userRouter.get('/me',isAuthenticated,getUserInfo)
 userRouter.post('/social-auth',socialAuth)

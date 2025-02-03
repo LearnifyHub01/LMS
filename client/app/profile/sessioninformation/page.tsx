@@ -6,7 +6,7 @@ import Heading from '@/app/utils/Heading';
 import Header from '@/app/components/Header';
 import { useSelector } from 'react-redux'; // Corrected import (useSelector, not UseSelector)
 import { usePathname } from 'next/navigation';
-import ChangePassword from '@/app/components/Profile/ChangePassword';
+import SessionInfo from '@/app/components/Profile/SessionInfo';
 
 
 type Props = {};
@@ -36,7 +36,7 @@ const Page: FC<Props> = () => { // Corrected component name to start with upperc
           route={route}
         />
         {/* Pass the `user` prop to the Profile component */}
-        <ChangePassword user={user} />
+        <SessionInfo/>
       </Protected>
     </div>
   );

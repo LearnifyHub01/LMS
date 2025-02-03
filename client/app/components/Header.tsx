@@ -21,7 +21,6 @@ type Props = {
   activeItem: number;
   route: string;
   setRoute: (route: string) => void;
- 
 };
 
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
@@ -30,6 +29,8 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const { user } = useSelector((state: any) => state.auth);
   const { data } = useSession();
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
+
+
   
 
   useEffect(() => {
@@ -79,8 +80,6 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     setOpenSidebar(false);
     setOpen(true);
   };
-  console.log("data", data);
-  console.log("user", user);
 
   return (
     <div className="w-full relative py-0">
