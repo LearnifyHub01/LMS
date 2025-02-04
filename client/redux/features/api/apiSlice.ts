@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { userLoggedIn } from "../auth/authSlice";
+import { setUser } from "../user/userSlice";
 
 export const apiSlice = createApi({
   reducerPath: "api",
@@ -36,6 +37,9 @@ export const apiSlice = createApi({
               user: result.data.user,
             })
           );
+          dispatch(
+            setUser(result.data.user)
+          )
         } catch (error: any) {
           console.log(error);
         }

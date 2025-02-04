@@ -29,7 +29,6 @@ type Props = {
   openSidebar: boolean;
   setOpenSidebar: (open: boolean) => void;
 
-
 };
 
 const NavItems: React.FC<Props> = ({
