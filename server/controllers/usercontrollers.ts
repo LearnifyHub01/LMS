@@ -457,13 +457,13 @@ export const updateAccessToken = CatchAsyncError(
         return next(new ErrorHandler("JWT and Session ID must be provided", 400));
       }
 
-      console.log("Received refresh_token:", refresh_token);
+      //console.log("Received refresh_token:", refresh_token);
 
       // Decode the refresh token to get the user ID
       let decoded: any;
       try {
         decoded = jwt.verify(refresh_token, process.env.REFRESH_TOKEN as string) as JwtPayload;
-        console.log("Decoded refresh token:", decoded);
+        //console.log("Decoded refresh token:", decoded);
       } catch (err) {
         console.error("Error verifying refresh token:", err);
         return next(new ErrorHandler("Invalid or expired refresh token", 400));
@@ -480,7 +480,7 @@ export const updateAccessToken = CatchAsyncError(
       const sessionKey = `session:${userId}:${sessionId}`;
       const sessionJson = await redis.get(sessionKey);
 
-      console.log("Session data from Redis:", sessionJson);
+      //console.log("Session data from Redis:", sessionJson);
 
       if (!sessionJson) {
         return next(new ErrorHandler("Session not found or expired", 400));
@@ -646,7 +646,15 @@ export const UpdateUserInfo = CatchAsyncError(
       }
 
       await user?.save();
-      await redis.set(userId as any, JSON.stringify(user));
+      const sessionKeys = await redis.keys(`session:${userId}:*`)
+      for(const key of sessionKeys){
+       const existingSession = await redis.get(key);
+       if(existingSession){
+         const sessionData = JSON.parse(existingSession);
+         sessionData.sessionUser.name = user?.name
+         await redis.set(key,JSON.stringify(sessionData))
+       }
+      }
 
       res.status(201).json({
         success: true,
@@ -669,7 +677,7 @@ export const updatePassword = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { oldPassword, newPassword } = req.body as IUpdateUserPassword;
-
+      const userId = req.user?._id
       if (!oldPassword || !newPassword) {
         return next(new ErrorHandler("Please enter old and new password", 400));
       }
@@ -688,7 +696,15 @@ export const updatePassword = CatchAsyncError(
 
       user.password = newPassword as string;
       await user.save();
-      await redis.set(req.user?._id as any, JSON.stringify(user));
+      const sessionKeys = await redis.keys(`session:${userId}:*`)
+      for(const key of sessionKeys){
+       const existingSession = await redis.get(key);
+       if(existingSession){
+         const sessionData = JSON.parse(existingSession);
+         sessionData.sessionUser.password = user?.password
+         await redis.set(key,JSON.stringify(sessionData))
+       }
+      }
       res.status(201).json({
         success: true,
         user,
@@ -738,7 +754,15 @@ export const updateProfilePicture = CatchAsyncError(
         }
       }
       await user?.save();
-      await redis.set(userId as any, JSON.stringify(user));
+     const sessionKeys = await redis.keys(`session:${userId}:*`)
+     for(const key of sessionKeys){
+      const existingSession = await redis.get(key);
+      if(existingSession){
+        const sessionData = JSON.parse(existingSession);
+        sessionData.sessionUser.avatar = user?.avatar
+        await redis.set(key,JSON.stringify(sessionData))
+      }
+     }
 
       res.status(200).json({
         success: "true",

@@ -27,11 +27,13 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
   const  {user}  = useSelector((state: any) => state.auth);
+  console.log(user)
   const { data } = useSession();
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
 
   //this is only use for image bcz when i update image need one refresh for update reflacte solve this issue 
-  const  storeUser  = useSelector((state: any) => state.user.user);
+const  storeUser  = useSelector((state: any) => state.user.user);
+  console.log('storeuser',storeUser)
 
  
   

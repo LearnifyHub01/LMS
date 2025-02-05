@@ -102,8 +102,10 @@ export const sendToken = async (user:IUser,statusCode:number,res:Response,userAg
         _id: user._id,
         name: user.name,
         email: user.email,
+        password:user.password,
         role: user.role,
         isVerified: user.isVerified,
+        avatar:user.avatar
       },
       refreshToken,
       ipAddress,

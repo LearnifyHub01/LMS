@@ -98,14 +98,87 @@ const EncryptButton = () => {
   );
 };
 const SessionInfo: FC<Props> = ({ user }) => {
-  const router = useRouter();
-  const [cureentSessionId, setCurrentSessionId] = useState("");
-  const [session, setSession] = useState([]);
+  // const router = useRouter();
+  // const [cureentSessionId, setCurrentSessionId] = useState("");
+  // const [session, setSession] = useState([]);
+  // const [openSidebar, setOpenSidebar] = useState(false);
+  // const [logout, setLogout] = useState(false);
 
+  // const {} = useLogoutFromAllQuery(undefined, {
+  //   skip: !logout ? true : false,
+  // });
+
+  // const {
+  //   data,
+  //   isLoading: logoutLoading,
+  //   isSuccess: logoutSuccess,
+  //   error: logoutError,
+  // } = useLogOutQuery(undefined, {
+  //   skip: !logout,
+  // });
+  // useEffect(() => {
+  //   // Automatically close the sidebar on larger screens
+  //   const handleResize = () => {
+  //     if (window.innerWidth > 800 && openSidebar) {
+  //       setOpenSidebar(false);
+  //     }
+  //   };
+
+  //   window.addEventListener("resize", handleResize);
+  //   return () => window.removeEventListener("resize", handleResize);
+  // }, [openSidebar]);
+  // useEffect(() => {
+  //   setSession(user.sessions);
+  // }, [session, user]);
+  
+
+  // const handleLogOut = async () => {
+  //   await signOut({ redirect: false });
+  //   setLogout(true);
+  // };
+  // const handleLogoutFromAll = async () => {
+  //   await signOut({ redirect: false });
+  //   setLogout(true);
+  //   redirect("/");
+  // };
+  // const getCurrentCookie = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       "http://localhost:8080/api/v1/get-current-cookie",
+  //       { withCredentials: true }
+  //     );
+  //     setCurrentSessionId(response.data.sessionId);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   getCurrentCookie();
+  // }, [getCurrentCookie]);
+  const router = useRouter();
+  const [currentSessionId, setCurrentSessionId] = useState("");
+  const [session, setSession] = useState([]);
   const [openSidebar, setOpenSidebar] = useState(false);
+  const [logout, setLogout] = useState(false);
+  const [logoutFromAll, setLogoutFromAll] = useState(false);
+
+  // Fetch logout queries only when triggered
+  const logoutQuery = useLogOutQuery(undefined, { skip: !logout });
+  const logoutFromAllQuery = useLogoutFromAllQuery(undefined, { skip: !logoutFromAll });
 
   useEffect(() => {
-    // Automatically close the sidebar on larger screens
+    if (logout) logoutQuery.refetch();
+  }, [logout]);
+
+  useEffect(() => {
+    if (logoutFromAll) logoutFromAllQuery.refetch();
+  }, [logoutFromAll]);
+
+  useEffect(() => {
+    setSession(user.sessions);
+  }, [user]);
+
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 800 && openSidebar) {
         setOpenSidebar(false);
@@ -115,47 +188,30 @@ const SessionInfo: FC<Props> = ({ user }) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [openSidebar]);
-  useEffect(() => {
-    setSession(user.sessions);
-  }, [session, user]);
-  const [logout, setLogout] = useState(false);
-  const {} = useLogoutFromAllQuery(undefined, {
-    skip: !logout ? true : false,
-  });
-
-  const {
-    data,
-    isLoading: logoutLoading,
-    isSuccess: logoutSuccess,
-    error: logoutError,
-  } = useLogOutQuery(undefined, {
-    skip: !logout,
-  });
 
   const handleLogOut = async () => {
     await signOut({ redirect: false });
     setLogout(true);
   };
+
   const handleLogoutFromAll = async () => {
     await signOut({ redirect: false });
-
-    setLogout(true);
+    setLogoutFromAll(true);
     redirect("/");
   };
-  const getCurrentCookie = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:8080/api/v1/get-current-cookie",
-        { withCredentials: true }
-      );
-      setCurrentSessionId(response.data.sessionId);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+
   useEffect(() => {
+    const getCurrentCookie = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/v1/get-current-cookie", { withCredentials: true });
+        setCurrentSessionId(response.data.sessionId);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     getCurrentCookie();
-  }, [getCurrentCookie]);
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen  overflow-hidden bg-gray-100 dark:bg-[#121212]">
@@ -241,14 +297,15 @@ const SessionInfo: FC<Props> = ({ user }) => {
                          hover:scale-105 hover:shadow-xl active:scale-95"
               onClick={handleLogOut}
             >
-              {logoutLoading ? (
+              {/* {logoutLoading ? (
                 <FaSpinner className="animate-spin text-lg" />
               ) : (
                 <>
                   <FaSignOutAlt className="text-lg" />
                   <span className="font-medium">Logout</span>
                 </>
-              )}
+              )} */}
+              logout
             </button>
           </div>
         </div>

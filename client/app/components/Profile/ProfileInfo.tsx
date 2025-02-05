@@ -291,6 +291,7 @@ const EncryptButton = () => {
 const ProfileInfo: FC<Props> = ({user}) => {
   const dispatch = useDispatch()
   const storeUser = useSelector((state: RootState) => state.user.user);
+  console.log(storeUser)
 
   const [name, setName] = useState(storeUser?.name || "");
   const [avatar,setAvatar]= useState(storeUser?.avatar?.url || avtarIcon )
