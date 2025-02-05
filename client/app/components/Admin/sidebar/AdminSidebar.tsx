@@ -30,14 +30,14 @@ interface ItemsProps {
 const Item: FC<ItemsProps> = ({ title, to, icon, selected, setSelected }) => {
   return (
     <MenuItem
-      active={selected === title}
-      onClick={() => setSelected(title)}
-      icon={icon}
-      className="text-black hover:bg-gray-700 active:bg-gray-800 cursor-pointer"
-    >
-      <Typography className="text-base font-Poppins">{title}</Typography>
-      <Link href={to} />
-    </MenuItem>
+    active={selected === title}
+    onClick={() => setSelected(title)}
+    icon={icon}
+    className="text-black hover:bg-gray-700 active:bg-gray-800 cursor-pointer"
+    component={<Link href={to} />}
+  >
+    <Typography className="text-base font-Poppins">{title}</Typography>
+  </MenuItem>
   );
 };
 
@@ -81,8 +81,8 @@ const AdminSidebar = () => {
                 <Box display="flex" justifyContent="center" alignItems="center">
                   <Image
                     alt="profile-user"
-                    width={100}
-                    height={100}
+                    width={90}
+                    height={90}
                     src={user.avatar ? user.avatar.url : avatarDefault}
                     style={{
                       cursor: "pointer",

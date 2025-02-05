@@ -15,20 +15,22 @@ const Page: FC<Props> = () => { // Corrected component name to start with upperc
   const [open, setOpen] = useState(false);
   const [activeItem, setActiveItem] = useState(5);
   const [route, setRoute] = useState("Login");
+  const {user} = useSelector((state: any) => state.auth);
 
   // Use the useSelector hook to get the user from Redux state
-  const { user } = useSelector((state: any) => state.auth);
+  const storeUser  = useSelector((state: any) => state.user.user);
+
+  
 
   return (
     <div>
       <Protected>
         <Heading
-          title={`${user?.name || "User"}'s profile`}  // Dynamically setting profile name
+          title={`${storeUser?.name || "User"}'s profile`}  // Dynamically setting profile name
           description="It is a good platform"
           keywords="programming,MERN"
         />
         <Header
-        
           open={open}
           setOpen={setOpen}
           activeItem={activeItem}

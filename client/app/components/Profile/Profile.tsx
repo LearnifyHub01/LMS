@@ -42,7 +42,7 @@ const Profile: FC<Props> = ({ user }) => {
     <div className="flex mx-auto  ">
   
         <div className="w-full h-full bg-transparent  ">
-          <ProfileInfo avatar={avatar} user={user} />
+          <ProfileInfo user={user} />
         </div>
   
     </div>

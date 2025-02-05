@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Link from "next/link";
 import { AiFillHome } from "react-icons/ai";
@@ -12,6 +11,8 @@ import { useLogOutQuery } from "@/redux/features/auth/authApi";
 import { redirect } from "next/navigation";
 import { signOut } from "next-auth/react";
 import avatar from "../../public/assests/download5.png";
+import { useSelector } from "react-redux";
+import { RiAdminFill } from "react-icons/ri";
 
 export const NavItemsData = [
   { name: "Home", url: "/" },
@@ -28,7 +29,6 @@ type Props = {
   setOpen: (open: boolean) => void;
   openSidebar: boolean;
   setOpenSidebar: (open: boolean) => void;
-
 };
 
 const NavItems: React.FC<Props> = ({
@@ -43,77 +43,75 @@ const NavItems: React.FC<Props> = ({
   const {} = useLogOutQuery(undefined, {
     skip: !logout ? true : false,
   });
-  
+
+  const storeUser = useSelector((state: any) => state.user.user);
+
   const handleUserIconClick = () => {
     setOpenSidebar(!openSidebar);
     setOpen(true);
   };
   const logOutHandler = async () => {
-    await signOut({redirect:false});
+    await signOut({ redirect: false });
     setLogout(true);
-    redirect('/')
+    redirect("/");
   };
-
-
-
 
   return (
     <div>
-       {user ? (
-       <div className="hidden 800px:flex space-x-8">
-       {NavItemsData.map((i, index) => (
-         <Link href={i.url} key={index} passHref>
-           <span
-  className={`group relative flex items-center transition-all cursor-pointer text-[18px] font-Poppins font-[400] ${
-    activeItem === index ? "text-red-600 dark:text-green-400" : "text-black dark:text-white"
-  }`}
->
-             <span className="relative group-hover:text-[#4CBB17]">
-               <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 mr-1">
-                 [
-               </span>
-               <span className="group-hover:text-[#2bd576] transition-all duration-300">
-                 {i.name}
-               </span>
-               <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 ml-1">
-                 ]
-               </span>
-             </span>
-           </span>
-         </Link>
-       ))}
-     </div>
-      ) : (
+      {user ? (
         <div className="hidden 800px:flex space-x-8">
-          {NavItemsData.map(
-            (i, index) => (
-              <Link href={i.url} key={index} passHref>
-                <span
-                  className={`group relative flex items-center transition-all cursor-pointer text-[18px] font-Poppins font-[400] ${
-                    activeItem === index
-
-                      ? "dark:text-[#37a39a] text-[crimson]"
-                      : "dark:text-white text-black"
-                  }`}
-                >
-                  <span className="relative group-hover:text-[#4CBB17]">
-                    <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 mr-1">
-                      [
-                    </span>
-                    <span className="group-hover:text-[#2bd576] transition-all duration-300">
-                      {i.name}
-                    </span>
-                    <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 ml-1">
-                      ]
-                    </span>
+          {NavItemsData.map((i, index) => (
+            <Link href={i.url} key={index} passHref>
+              <span
+                className={`group relative flex items-center transition-all cursor-pointer text-[18px] font-Poppins font-[400] ${
+                  activeItem === index
+                    ? "text-red-600 dark:text-green-400"
+                    : "text-black dark:text-white"
+                }`}
+              >
+                <span className="relative group-hover:text-[#4CBB17]">
+                  <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 mr-1">
+                    [
+                  </span>
+                  <span className="group-hover:text-[#2bd576] transition-all duration-300">
+                    {i.name}
+                  </span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 ml-1">
+                    ]
                   </span>
                 </span>
-              </Link>
-            )
-          )}
+              </span>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="hidden 800px:flex space-x-8">
+          {NavItemsData.map((i, index) => (
+            <Link href={i.url} key={index} passHref>
+              <span
+                className={`group relative flex items-center transition-all cursor-pointer text-[18px] font-Poppins font-[400] ${
+                  activeItem === index
+                    ? "dark:text-[#37a39a] text-[crimson]"
+                    : "dark:text-white text-black"
+                }`}
+              >
+                <span className="relative group-hover:text-[#4CBB17]">
+                  <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 mr-1">
+                    [
+                  </span>
+                  <span className="group-hover:text-[#2bd576] transition-all duration-300">
+                    {i.name}
+                  </span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 ml-1">
+                    ]
+                  </span>
+                </span>
+              </span>
+            </Link>
+          ))}
         </div>
       )}
-     
+
       {isMobile &&
         /*when user is  logged in */
         (user ? (
@@ -138,11 +136,11 @@ const NavItems: React.FC<Props> = ({
                 }`}
               >
                 <Image
-                 src={user?.avatar?.url ||avatar }
-                 alt="Profile Picture"
-                 height={4000}
-                 width={3000}
-                 className="w-[50] h-[50] cursor-pointer border-[2px] border-[#37a39a] rounded-full object-cover"
+                  src={storeUser?.avatar?.url || avatar}
+                  alt="Profile Picture"
+                  height={4000}
+                  width={3000}
+                  className="w-[50] h-[50] cursor-pointer border-[2px] border-[#37a39a] rounded-full object-cover"
                 />
                 <div className="flex flex-col">
                   <span className="font-semibold text-gray-800 dark:text-gray-200">
@@ -160,43 +158,17 @@ const NavItems: React.FC<Props> = ({
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                   <Link href="/profile">
-                  <li
-                    className={`${
-                      activeItem === 2
-                        ? "text-[crimson] dark:text-[#2bd576]"
-                        : "text-black dark:text-white"
-                    } flex items-center p-2 rounded-lg cursor-pointer`}
-                  >
-                    <FaUser size={20} className="mr-2" />
-                    Profile
-                  </li>
+                    <li
+                      className={`${
+                        activeItem === 2
+                          ? "text-[crimson] dark:text-[#2bd576]"
+                          : "text-black dark:text-white"
+                      } flex items-center p-2 rounded-lg cursor-pointer`}
+                    >
+                      <FaUser size={20} className="mr-2" />
+                      Profile
+                    </li>
                   </Link>
-                
-                  <Link href="/profile/sessioninformation">
-                  <li
-                    className={`${
-                      activeItem === 2
-                        ? "text-[crimson] dark:text-[#2bd576]"
-                        : "text-black dark:text-white"
-                    } flex items-center p-2 rounded-lg cursor-pointer`}
-                  >
-                    <FaUnlockAlt size={20} className="mr-2" />
-                    Change Password
-                  </li>
-                  </Link>
-                  <Link href="/profile/changepassword">
-                  <li
-                    className={`${
-                      activeItem === 2
-                        ? "text-[crimson] dark:text-[#2bd576]"
-                        : "text-black dark:text-white"
-                    } flex items-center p-2 rounded-lg cursor-pointer`}
-                  >
-                    <FaUnlockAlt size={20} className="mr-2" />
-                    sessions
-                  </li>
-                  </Link>
-                 
                   <li
                     className={`${
                       activeItem === 3
@@ -207,6 +179,33 @@ const NavItems: React.FC<Props> = ({
                     <FaChalkboardTeacher size={20} className="mr-2" />
                     Enrolled Courses
                   </li>
+
+                  <Link href="/profile/changepassword">
+                    <li
+                      className={`${
+                        activeItem === 2
+                          ? "text-[crimson] dark:text-[#2bd576]"
+                          : "text-black dark:text-white"
+                      } flex items-center p-2 rounded-lg cursor-pointer`}
+                    >
+                      <FaUnlockAlt size={20} className="mr-2" />
+                      Change Password
+                    </li>
+                  </Link>
+                  <Link href="/profile/sessioninformation">
+                    <li
+                      className={`${
+                        activeItem === 2
+                          ? "text-[crimson] dark:text-[#2bd576]"
+                          : "text-black dark:text-white"
+                      } flex items-center p-2 rounded-lg cursor-pointer`}
+                    >
+                        <RiAdminFill  size={20} className="mr-2" />
+                      Device Info
+                    </li>
+                  </Link>
+
+            
                   <li
                     className={`${
                       activeItem === 4
@@ -361,7 +360,7 @@ const NavItems: React.FC<Props> = ({
                     : "dark:text-white text-black"
                 } flex items-center p-2 rounded-lg group text-center text-[20px] px-6 font-Poppins font-[100] mb-4 cursor-pointer`}
               >
-                <MdGroupAdd className="mr-3 group-hover:text-[#4CBB17] "/>
+                <MdGroupAdd className="mr-3 group-hover:text-[#4CBB17] " />
                 <span className="relative group-hover:text-[#4CBB17]">
                   <span className="absolute -left-2 group-hover:opacity-100 opacity-0 transition-all duration-300 mr-2">
                     [{" "}
@@ -448,7 +447,6 @@ const NavItems: React.FC<Props> = ({
           </div>
         ))}
     </div>
-     
   );
 };
 

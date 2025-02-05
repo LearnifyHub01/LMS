@@ -37,7 +37,7 @@
 // } = userApi;
 
 import { apiSlice } from "../api/apiSlice";
-import { updateUserName } from "../user/userSlice";
+import { updateUserName , setUpdateImage} from "../user/userSlice";
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -48,6 +48,14 @@ export const userApi = apiSlice.injectEndpoints({
         body: { avatar },
         credentials: "include" as const,
       }),
+      async onQueryStarted({ avatar }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(setUpdateImage(avatar)); // ✅ Update Redux immediately
+        } catch (error) {
+          console.error("Error updating profile:", error);
+        }
+      },
     }),
 
     editProfile: builder.mutation({

@@ -26,11 +26,14 @@ type Props = {
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
-  const { user } = useSelector((state: any) => state.auth);
+  const  {user}  = useSelector((state: any) => state.auth);
   const { data } = useSession();
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
 
+  //this is only use for image bcz when i update image need one refresh for update reflacte solve this issue 
+  const  storeUser  = useSelector((state: any) => state.user.user);
 
+ 
   
 
   useEffect(() => {
@@ -127,7 +130,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               {user ? (
                 <Link href={"/profile"}>
                   <Image
-                    src={user?.avatar?.url ||avatar}
+                    src={storeUser?.avatar?.url || avatar}
                     alt="Profile Picture"
                     height={4000}
                     width={3000}

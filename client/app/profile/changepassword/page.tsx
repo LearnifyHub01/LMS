@@ -18,7 +18,7 @@ const Page: FC<Props> = () => { // Corrected component name to start with upperc
 
 
   // Use the useSelector hook to get the user from Redux state
-  const { user } = useSelector((state: any) => state.user.user);
+  const { user } = useSelector((state: any) => state.auth);
   const pathname = usePathname();
   return (
     <div>

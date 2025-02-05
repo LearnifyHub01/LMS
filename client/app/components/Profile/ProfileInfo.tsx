@@ -206,18 +206,20 @@ import { useLogOutQuery } from "@/redux/features/auth/authApi";
 import { FiLock } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FaChalkboardTeacher } from "react-icons/fa";
-import {updateUserName,setUser} from '@/redux/features/user/userSlice'
-const TARGET_TEXT = "Change Password";
-const CYCLES_PER_LETTER = 2;
-const SHUFFLE_TIME = 50;
-const CHARS = "!@#$%^&*():{};|,.<>/?";
+import {setUser} from '@/redux/features/user/userSlice'
 import { MdVerified } from "react-icons/md";
 import { RiAdminFill } from "react-icons/ri";
 import { useDispatch,useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { signOut } from "next-auth/react";
+import { redirect } from "next/dist/server/api-utils";
+
+const TARGET_TEXT = "Change Password";
+const CYCLES_PER_LETTER = 2;
+const SHUFFLE_TIME = 50;
+const CHARS = "!@#$%^&*():{};|,.<>/?";
 
 type Props = {
-  avatar: string | null;
   user: any;
 };
 
@@ -265,7 +267,7 @@ const EncryptButton = () => {
       whileTap={{ scale: 0.95 }}
       onMouseEnter={scramble}
       onMouseLeave={stopScramble}
-      className="group relative px-4 py-2 font-medium dark: text-slate-100 transition-colors duration-[400ms] hover:text-indigo-300"
+      className="group relative px-4 py-2 w-full font-medium dark: text-slate-100 transition-colors duration-[400ms] hover:text-indigo-300"
     >
       <div className="relative z-10 flex items-center gap-2">
         <FiLock />
@@ -286,24 +288,32 @@ const EncryptButton = () => {
   );
 };
 
-const ProfileInfo: FC<Props> = ({ avatar, user }) => {
+const ProfileInfo: FC<Props> = ({user}) => {
   const dispatch = useDispatch()
   const storeUser = useSelector((state: RootState) => state.user.user);
-  console.log(storeUser?.name)
-  console.log("Full Redux Store:", storeUser);
-console.log("User Name:", storeUser?.name);
 
   const [name, setName] = useState(storeUser?.name || "");
-
-
+  const [avatar,setAvatar]= useState(storeUser?.avatar?.url || avtarIcon )
   const [editProfile, { isSuccess, error }] = useEditProfileMutation();
-  const [updateAvatar, { isSuccess: success, error: updateError }] =
-    useUpdateAvatarMutation();
+  const [updateAvatar, { isSuccess: success, error: updateError }] =useUpdateAvatarMutation();
   const [loadUser, setLoadUser] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   useLoadUserQuery(undefined, { skip: !loadUser });
-
   const [logout, setLogout] = useState(false);
+    const [openSidebar, setOpenSidebar] = useState(false);
+  
+    useEffect(() => {
+      // Automatically close the sidebar on larger screens
+      const handleResize = () => {
+        if (window.innerWidth > 800 && openSidebar) {
+          setOpenSidebar(false);
+        }
+      };
+  
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, [openSidebar]);
+
   const {
     data,
     isLoading: logoutLoading,
@@ -313,8 +323,9 @@ console.log("User Name:", storeUser?.name);
     skip: !logout,
   });
 
-  const handleLogOut = () => {
-    setLogout(true);
+  const handleLogOut = async() => {
+     await signOut({redirect:false});
+      setLogout(true);
   };
 
   const imageHandler = async (e: any) => {
@@ -322,9 +333,13 @@ console.log("User Name:", storeUser?.name);
     if (!file) return;
 
     const fileReader = new FileReader();
-    fileReader.onload = () => {
+    console.log('file',fileReader)
+    fileReader.onload = async () => {
       if (fileReader.readyState === 2) {
-        updateAvatar(fileReader.result);
+         const updateUrl = await updateAvatar(fileReader.result).unwrap(); 
+         dispatch(setUser(updateUrl.user))
+         setAvatar(updateUrl.user.avatar.url)
+        
       }
     };
     fileReader.readAsDataURL(file);
@@ -350,6 +365,7 @@ console.log("User Name:", storeUser?.name);
     if (storeUser?.name) {
       setName(storeUser.name);
     }
+    
   }, [storeUser?.name]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -358,26 +374,26 @@ console.log("User Name:", storeUser?.name);
 
     try {
       const updatedUser = await editProfile({ name }).unwrap();
+      
       dispatch(setUser(updatedUser.user)); // ✅ Update Redux state only on submit
     } catch (error) {
       console.error("Failed to update profile", error);
     }
   };
   
-
-  
-
-
-
   return (
     <div className="flex flex-col min-h-screen  overflow-hidden bg-gray-100 dark:bg-[#121212]">
       <div className="flex flex-col md:flex-row gap-6 md:gap-0 max-w-full w-full md:py-0 flex-1">
         {/* Left Side: Profile Card */}
-        <div className="w-full md:w-[300px]  bg-gray-700 dark:bg-[#1e1e2e] shadow-xl p-6 text-center border border-gray-200 dark:border-gray-800 flex flex-col items-center justify-start space-y-4">
+        <div
+          className={`w-full md:w-[300px] bg-gray-700 dark:bg-[#1e1e2e] shadow-xl p-6 text-center border border-gray-200 dark:border-gray-800 flex flex-col items-center justify-start space-y-4 ${
+            openSidebar ? "block" : "hidden md:block"
+          }`}
+        >
           {/* Avatar Section */}
           <div className="relative w-20 h-20 mx-auto">
             <Image
-              src={user?.avatar?.url || avtarIcon}
+              src={avatar || avtarIcon}
               alt="Profile Picture"
               width={500}
               height={500}
@@ -426,7 +442,7 @@ console.log("User Name:", storeUser?.name);
             <br />
           </div>
 
-          <div className="flex justify-center mt-4">
+          <div className="flex w-full  mt-4">
             {user.role === "admin" && (
               <Link href="/admin" passHref>
                 <button className="group relative flex items-center gap-2 px-4 py-2 font-medium text-slate-100 transition-colors duration-[400ms] hover:text-indigo-300">
@@ -436,7 +452,7 @@ console.log("User Name:", storeUser?.name);
               </Link>
             )}
           </div>
-          <div className="flex justify-center mt-4">
+          <div className="flex  w-full  mt-4">
             <Link href="/profile/viewcourses" passHref>
               <button className="group relative flex items-center gap-2 px-4 py-2 font-medium text-slate-100 transition-colors duration-[400ms] hover:text-indigo-300">
                 <FaChalkboardTeacher size={20} />
@@ -452,10 +468,10 @@ console.log("User Name:", storeUser?.name);
             </Link>
           </div>
          
-          <div className="flex justify-center mt-4">
+          <div className="flex w-full   mt-4">
            
-              <Link href="/admin" passHref>
-                <button className="group relative flex jus items-center gap-2 px-4 py-2 font-medium text-slate-100 transition-colors duration-[400ms] hover:text-indigo-300">
+              <Link href="/profile/sessioninformation" passHref>
+                <button className="group relative  flex jus items-center gap-2 px-4 py-2 font-medium text-slate-100 transition-colors duration-[400ms] hover:text-indigo-300">
                   <RiAdminFill size={20} />
                   <span>Device Info</span>
                 </button>

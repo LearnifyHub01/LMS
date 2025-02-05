@@ -17,7 +17,9 @@ import {
 import { getUserbyId } from "../services/user.service";
 import cloudinary from "cloudinary";
 import { Session } from "inspector/promises";
+import os from 'os'
 const uaParser = require("ua-parser-js");
+
 
 
 //register user
@@ -444,6 +446,7 @@ export const logoutFromAllDevice = CatchAsyncError(
 //     }
 //   }
 // );
+
 export const updateAccessToken = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -473,7 +476,7 @@ export const updateAccessToken = CatchAsyncError(
         return next(new ErrorHandler("User not found", 404));
       }
 
-      // 1️⃣ Get session from Redis using session key
+     
       const sessionKey = `session:${userId}:${sessionId}`;
       const sessionJson = await redis.get(sessionKey);
 
@@ -510,12 +513,15 @@ export const updateAccessToken = CatchAsyncError(
       const userAgent = uaParser(req.headers["user-agent"]);
       const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP";
       user.sessions.push({
+        sessionKey: sessionId, 
         refreshToken: newRefreshToken,
         ipAddress: ipAddress,
         device: userAgent.ua,
         loginTime: new Date(),
-      } as ISession);
-
+        cpu: os.cpus()[0]?.model || "Unknown",
+        os: os.platform(), 
+        browser: userAgent.browser.name || "Unknown",
+      } as ISession)
       await user.save();
 
       res.status(200).json({
