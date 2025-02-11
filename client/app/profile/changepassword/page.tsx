@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import { useEffect } from 'react';
 import Protected from '@/app/hooks/useProtected';
 import Heading from '@/app/utils/Heading';
-import Header from '@/app/components/Header';
+import Header1 from '../Header1';
 import { useSelector } from 'react-redux'; // Corrected import (useSelector, not UseSelector)
 import { usePathname } from 'next/navigation';
 import ChangePassword from '@/app/components/Profile/ChangePassword';
@@ -28,7 +28,7 @@ const Page: FC<Props> = () => { // Corrected component name to start with upperc
           description="It is a good platform"
           keywords="programming,MERN"
         />
-        <Header
+        <Header1
           open={open}
           setOpen={setOpen}
           activeItem={activeItem}

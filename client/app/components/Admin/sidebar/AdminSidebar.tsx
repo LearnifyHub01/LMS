@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { Box, Typography } from "@mui/material";
 import avatarDefault from "../../../../public/assests/download5.png";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 
 interface ItemsProps {
   title: string;
@@ -30,14 +31,13 @@ interface ItemsProps {
 const Item: FC<ItemsProps> = ({ title, to, icon, selected, setSelected }) => {
   return (
     <MenuItem
-    active={selected === title}
-    onClick={() => setSelected(title)}
-    icon={icon}
-    className="text-black hover:bg-gray-700 active:bg-gray-800 cursor-pointer"
-    component={<Link href={to} />}
-  >
-    <Typography className="text-base font-Poppins">{title}</Typography>
-  </MenuItem>
+      active={selected === title}
+      onClick={() => setSelected(title)}
+      icon={icon}
+    >
+      <Typography className="!text-[16px] !font-Poppins">{title}</Typography>
+      <Link href={to} />
+    </MenuItem>
   );
 };
 
@@ -47,6 +47,7 @@ const AdminSidebar = () => {
   const [isCollapsed, isSetCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [mounted, setMounted] = useState(false);
+  const {theme, setTheme} = useTheme();
 
   useEffect(() => setMounted(true), []);
 
@@ -70,7 +71,7 @@ const AdminSidebar = () => {
             <MenuItem
               icon={<FaBars />}
               onClick={() => isSetCollapsed(!isCollapsed)}
-              className="cursor-pointer text-black hover:bg-gray-700 active:bg-gray-800"
+              className="cursor-pointer text-black"
             >
               {!isCollapsed}
             </MenuItem>
@@ -124,7 +125,7 @@ const AdminSidebar = () => {
               label="Data"
               icon={<FaFileAlt />}
               className="text-black"
-              defaultOpen={true} // Make the submenu open by default
+              defaultOpen={false} // Make the submenu open by default
             >
               <Item
                 title="Users"
@@ -147,7 +148,7 @@ const AdminSidebar = () => {
               label="Content"
               icon={<FaBook />}
               className="text-black"
-              defaultOpen={true} // Make the submenu open by default
+              defaultOpen={false} // Make the submenu open by default
             >
               <Item
                 title="Create Course"
@@ -170,7 +171,7 @@ const AdminSidebar = () => {
               label="Customization"
               icon={<FaCog />}
               className="text-black"
-              defaultOpen={true} // Make the submenu open by default
+              defaultOpen={false} 
             >
               <Item
                 title="Hero"
@@ -200,7 +201,7 @@ const AdminSidebar = () => {
               label="Controllers"
               icon={<FaUsers />}
               className="text-black"
-              defaultOpen={true} // Make the submenu open by default
+              defaultOpen={false} // Make the submenu open by default
             >
               <Item
                 title="Manage Team"
@@ -216,7 +217,7 @@ const AdminSidebar = () => {
               label="Analytics"
               icon={<FaChartBar />}
               className="text-black"
-              defaultOpen={true} // Make the submenu open by default
+              defaultOpen={false} // Make the submenu open by default
             >
               <Item
                 title="Courses Analytics"
@@ -246,7 +247,7 @@ const AdminSidebar = () => {
               label="Extras"
               icon={<FaCog />}
               className="text-black"
-              defaultOpen={true} // Make the submenu open by default
+              defaultOpen={false} // Make the submenu open by default
             >
               <Item
                 title="Settings"
@@ -270,4 +271,4 @@ const AdminSidebar = () => {
   );
 };
 
-export default AdminSidebar;
+export default AdminSidebar;

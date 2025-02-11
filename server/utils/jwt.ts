@@ -1,154 +1,136 @@
-require('dotenv').config()
-import {Response} from 'express'
-import userModel, { IUser,ISession } from '../models/user.model'
-import {redis} from './redis'
-import { v4 as uuidv4 } from 'uuid';
+require("dotenv").config();
+import { Response } from "express";
+import userModel, { IUser, ISession } from "../models/user.model";
+import { redis } from "./redis";
+import { v4 as uuidv4 } from "uuid";
+import { io } from "../server";
+import si from "systeminformation";
+import useragent from "express-useragent";
+import os from "os";
+import { sessionQueue } from "../queue/sessionQueue";
 
-
-
-interface ITokenOptions{
-    expire:Date,
-    maxAge:number,
-    httpOnly:boolean,
-    sameSite:'lax' | 'strict' | 'none' | undefined
-    secure?:boolean
+interface ITokenOptions {
+  expire: Date;
+  maxAge: number;
+  httpOnly: boolean;
+  sameSite: "lax" | "strict" | "none" | undefined;
+  secure?: boolean;
 }
 //parse env var. to integret with fallback values
-export const accessTokenExpire =parseInt(process.env.ACCESS_TOKEN_EXPIRE || '300',10)
-export const refreshTokenExpire =parseInt(process.env.REFRESH_TOKEN_EXPIRE || '1200',10)
+export const accessTokenExpire = parseInt(
+  process.env.ACCESS_TOKEN_EXPIRE || "300",
+  10
+);
+export const refreshTokenExpire = parseInt(
+  process.env.REFRESH_TOKEN_EXPIRE || "1200",
+  10
+);
 
-export const accessTokenOptions : ITokenOptions ={
-    expire : new Date(Date.now()+ accessTokenExpire*60*60 *1000),
-    maxAge:accessTokenExpire *60*60*1000,
-    httpOnly:true,
-    sameSite:'lax',
-    secure: process.env.NODE_ENV === 'production',
-}
+export const accessTokenOptions: ITokenOptions = {
+  expire: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
+  maxAge: accessTokenExpire * 60 * 60 * 1000,
+  httpOnly: true,
+  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production",
+};
 
-export const refreshTokenOptions : ITokenOptions ={
-    expire : new Date(Date.now()+ refreshTokenExpire *24*60*60*1000),
-    maxAge:refreshTokenExpire *24*60*60*1000,
-    httpOnly:true,
-    sameSite:'lax',
-    secure: process.env.NODE_ENV === 'production',
-}
-// export const sendToken = async (user:IUser,statusCode:number,res:Response,userAgent:any,ipAddress:string) =>{
-//     const accessToken =user.SignAccessToken()
-//     const refreshToken = user.SignRefreshToken()
-    
-//     // upload session to redis
+export const refreshTokenOptions: ITokenOptions = {
+  expire: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
+  maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
+  httpOnly: true,
+  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production",
+};
 
-//     const sessionId = uuidv4();  // Generate unique session ID
+export const sendToken = async (
+  user: IUser,
+  statusCode: number,
+  res: Response,
+  userAgent: any,
+  ipAddress: any,
+  loginTime: Date
+) => {
+  const accessToken = user.SignAccessToken();
+  const refreshToken = user.SignRefreshToken();
 
-//     // Create session data
-//     const sessionData = {
-//       sessionUser: {
-//         _id: user._id,
-//         name: user.name,
-//         email: user.email,
-//         role: user.role,
-//         isVerified: user.isVerified,
-//       },
-//       refreshToken,
-//       ipAddress,
-//       device: userAgent.ua,
-//       loginTime: new Date(),
-//     };
-    
-//     // Store session in Redis using the session key format `session:{userId}:{sessionId}`
-//     await redis.set(`session:${user._id}:${sessionId}`, JSON.stringify(sessionData));
+  const parser = useragent.parse(userAgent);
+  // upload session to redis
 
-  
-//       // Cookie settings for secure cookies in production
-//       if (process.env.NODE_ENV === 'production') {
-//         accessTokenOptions.secure = true;
-//       }
+  const sessionId = uuidv4(); // Generate unique session ID
+  const sessionKey = `session:${user._id}:${sessionId}`;
+  const SESSION_EXPIRATION = Number(process.env.SESSION_EXPIRATION) || 3600;
 
-    
+  const systemInfo = await si
+    .system()
+    .catch(() => ({ manufacturer: "Unknown Device" }));
+  const osInfo = await si.osInfo().catch(() => ({ hostname: "Unknown Host" }));
+  const deviceName = systemInfo.manufacturer || "Unknown Device";
+  const hostName = osInfo.hostname || os.hostname() || "Unknown Host";
 
-//     res.cookie("access_token",accessToken,accessTokenOptions)
-//     res.cookie('refresh_token',refreshToken,refreshTokenOptions)
+  // Create session data
+  const sessionData = {
+    sessionUser: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      isVerified: user.isVerified,
+      avatar: user.avatar,
+    },
+    refreshToken,
+    ipAddress,
+    deviceName,
+    hostName,
+    device: parser.isMobile ? "Mobile" : parser.isTablet ? "Tablet" : "Desktop",
+    browser: `${parser.browser} ${parser.version}` || "Unknown Browser",
+    sessionKey: sessionKey,
+    os: parser.os,
+    loginTime,
+  };
 
-    
-//     user.sessions.push({
-//         refreshToken,
-//         ipAddress,
-//         device: userAgent.ua,
-//         loginTime: new Date(),
-//     } as ISession);
-//     await user.save();
+  // Store session in Redis using the session key format `session:{userId}:{sessionId}`
+  await redis.set(
+    sessionKey,
+    JSON.stringify(sessionData),
+    "EX",
+     60
+  );
+  await sessionQueue.add("remove-session", { userId: user._id, sessionKey }, { delay: 604800000 });
+  res.cookie("session_id", sessionId, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production", // Set to true in production for secure cookies
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
-//     res.status(statusCode).json({
-//         secure:true,
-//         user,
-//         accessToken
-//     })
+  // Cookie settings for secure cookies in production
+  if (process.env.NODE_ENV === "production") {
+    accessTokenOptions.secure = true;
+  }
+  res.cookie("access_token", accessToken, accessTokenOptions);
+  res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 
-// }
-
-export const sendToken = async (user:IUser,statusCode:number,res:Response,userAgent:any,ipAddress:string) =>{
-    const accessToken =user.SignAccessToken()
-    const refreshToken = user.SignRefreshToken()
-    
-    // upload session to redis
-
-    const sessionId = uuidv4();  // Generate unique session ID
-    const sessionKey = `session:${user._id}:${sessionId}`;
-    
-
-    // Create session data
-    const sessionData = {
-      sessionUser: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        password:user.password,
-        role: user.role,
-        isVerified: user.isVerified,
-        avatar:user.avatar
-      },
-      refreshToken,
-      ipAddress,
-      device: userAgent.device,
-      browser:userAgent.browser,
-      os:userAgent.os,
-      cpu:userAgent.cpu,
-      sessionKey:sessionKey,
-      loginTime: new Date(),
-    };
-    
-    // Store session in Redis using the session key format `session:{userId}:{sessionId}`
-    await redis.set(sessionKey, JSON.stringify(sessionData));
-    res.cookie('session_id', sessionId, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production', // Set to true in production for secure cookies
-      });
-  
-      // Cookie settings for secure cookies in production
-      if (process.env.NODE_ENV === 'production') {
-        accessTokenOptions.secure = true;
-      }
-    res.cookie("access_token",accessToken,accessTokenOptions)
-    res.cookie('refresh_token',refreshToken,refreshTokenOptions)
-
-      
   user.sessions.push({
     refreshToken,
     ipAddress,
-    device: userAgent.device,
-    browser: userAgent.browser,
-    os: userAgent.os,
-    cpu: userAgent.cpu,
-    sessionKey:sessionKey,  // This is where the `sId` should be correctly assigned
-    loginTime: new Date(),
-} as ISession);
-    await user.save();
+    deviceName,
+    hostName,
+    device: parser.isMobile ? "Mobile" : parser.isTablet ? "Tablet" : "Desktop",
+    browser: `${parser.browser} ${parser.version}` || "Unknown Browser",
+    sessionKey: sessionKey,
+    os: parser.os,
+    loginTime,
+  } as ISession);
 
-    res.status(statusCode).json({
-        secure:true,
-        user,
-        accessToken
-    })
+   await user.save();
+  // When new session is created
+  
 
-}
+  io.emit("updateDevices", user.sessions); // Send to all connected clients
+  res.status(statusCode).json({
+    secure: true,
+    user,
+    accessToken,
+  });
+};

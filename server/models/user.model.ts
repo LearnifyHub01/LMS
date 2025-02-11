@@ -11,9 +11,10 @@ const emailRegexPattern: RegExp =
     refreshToken:string,
     ipAddress:string,
     device:string,
+    deviceName:string
+    hostName:string
     browser:string,
     os:string,
-    cpu:string,
     sessionKey:string
     loginTime:Date,
   }
@@ -23,8 +24,9 @@ const emailRegexPattern: RegExp =
     ipAddress: { type: String, required: true },
     device: { type: String, required: true },
     browser:{type: String, required: true },
+    deviceName: { type: String, required: true, default: "Unknown Device" },  // ✅ Default value
+    hostName: { type: String, required: true, default: "Unknown Host" },
     os:{type: String, required: true },
-    cpu:{type: String, required: true},
     sessionKey:{type: String, required: true},
     loginTime: { type: Date, default: Date.now }
   })
@@ -105,7 +107,7 @@ userSchema.pre<IUser>("save", async function (next) {
 userSchema.methods.SignAccessToken = function (){
  return jwt.sign({id:this._id},process.env.ACCESS_TOKEN || '',
   {
-    expiresIn: "5m",  // Expiry time set to 5 minutes
+    expiresIn: "1d",  // Expiry time set to 5 minutes
   }
  )
 }

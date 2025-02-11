@@ -1,18 +1,102 @@
-import { app } from "./app"
+// import { app } from "./app";
+// import connectDB from "./utils/ds";
+// import { v2 as cloudinary } from 'cloudinary';
+// import http from 'http';
+// import { Server } from 'socket.io';
+
+// require("dotenv").config();
+
+// // Cloudinary config
+// cloudinary.config({
+//   cloud_name: process.env.CLOUD_NAME,
+//   api_key: process.env.CLOUD_API_KEY,
+//   api_secret: process.env.CLOUD_SECRET_KEY
+// });
+
+// // Create an HTTP server and bind Socket.io to it
+// const server = http.createServer(app);
+// const io = new Server(server);
+// export {io}
+
+// // Handle Socket.io connections
+// io.on('connection', (socket) => {
+//     console.log('A user connected');
+  
+//     socket.on("userLoggedIn", (data) => {
+//       io.emit("updateDevices", data);  // Emit to all clients
+//     });
+    
+//     socket.on("logoutFromAll", (userId) => {
+//       console.log(`🚪 Logging out user: ${userId}`);
+//       io.to(`user-${userId}`).emit(`logout-${userId}`);
+//       io.in(`user-${userId}`).socketsLeave(`user-${userId}`);
+//     });
+  
+//     // Handle disconnections
+//     socket.on('disconnect', () => {
+//       console.log('A user disconnected');
+//     });
+//   });
+
+// // Start the server
+// server.listen(process.env.PORT, () => {
+//   console.log(`Server is connected with port ${process.env.PORT}`);
+//   connectDB();
+//   console.log('DB connected');
+// });
+
+import { app } from "./app";
 import connectDB from "./utils/ds";
-import {v2 as cloudinary} from 'cloudinary'
+import { v2 as cloudinary } from "cloudinary";
+import http from "http";
+import { Server } from "socket.io";
+
 require("dotenv").config();
 
-//cloudnary config
+// Cloudinary configuration
 cloudinary.config({
-    cloud_name:process.env.CLOUD_NAME,
-    api_key:process.env.CLOUD_API_KEY,
-    api_secret : process.env.CLOUD_SECRET_KEY
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_SECRET_KEY,
+});
 
-})
+// Create an HTTP server and attach Socket.io
+const server = http.createServer(app);
+const io = new Server(server);
 
-app.listen(process.env.PORT, () => {
-    console.log(`server is connected with port ${process.env.PORT}`);
-    connectDB();
-    console.log('db connected')
-})
+export { io };
+
+// Handle Socket.io connections
+io.on("connection", (socket) => {
+  console.log(`✅ A user connected: ${socket.id}`);
+
+  // ✅ Listen for user login and join room
+  socket.on("userLoggedIn", (userId) => {
+    console.log(`🚪 Joining room: user-${userId}`);
+    socket.join(`user-${userId}`);
+    io.to(`user-${userId}`).emit("updateDevices", { userId });
+  });
+
+  // ✅ Handle logout from all devices
+  socket.on("logoutFromAll", (userId) => {
+    console.log(`🚪 Logging out user: ${userId} from all devices`);
+    io.emit("logoutAllDevices", { userId });
+  });
+
+  socket.on("logoutSpecificDevice", ({ sessionKey }) => {
+    console.log(`📡 Logout Specific Device: ${sessionKey}`);
+    io.emit("logoutSpecificDevice", { sessionKey });
+  })
+
+  // Handle user disconnection
+  socket.on("disconnect", () => {
+    console.log(`❌ A user disconnected: ${socket.id}`);
+  });
+});
+
+// Start the server
+server.listen(process.env.PORT, () => {
+  console.log(`🚀 Server running on port ${process.env.PORT}`);
+  connectDB();
+  console.log("✅ Database connected");
+});

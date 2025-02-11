@@ -6,10 +6,20 @@ import cookieParser from "cookie-parser";
 import { Request, Response, NextFunction } from "express"
 import userRouter from './routes/user.route'
 import courseRouter from "./routes/course.route";
+import compression, { filter } from 'compression';
 export const app = express();
 
-
-
+app.use(compression({
+  level:6,
+  threshold:0,
+  filter:(req,res)=>{
+    if(req.headers['x-no-compression']){
+      return false
+    }
+    return compression.filter(req,res)
+  }
+}
+))
 
 app.use(express.json({ limit: "50mb" }));
 

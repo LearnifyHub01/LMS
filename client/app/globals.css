@@ -80,3 +80,18 @@ html, body {
   height: 100%;
   overflow: auto;
 }
+
+.marquee-no-scrollbar::-webkit-scrollbar {
+  display: none;  
+}
+
+
+/* Prevent scrolling in the specific Marquee container */
+.marquee-container {
+  overflow: hidden; /* Prevent scrolling within this container */
+  pointer-events: none; /* Disable user interaction (prevents accidental scrolling) */
+}
+
+.marquee-no-scrollbar {
+  pointer-events: auto; /* Allow Marquee to remain interactive if necessary */
+}

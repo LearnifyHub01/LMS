@@ -2,20 +2,10 @@ import React, { FC, useState, useEffect } from "react";
 import Link from "next/link";
 import NavItems from "../utils/NavItems";
 import { ThemeSwitcher } from "../utils/ThemeSwitcher";
-import CustomModel from "../utils/CustomModel";
-import Login from "./Auth/Login";
-import SignUp from "./Auth/SignUp";
-import Verification from "./Auth/Verification";
 import { useSelector } from "react-redux";
-import { FiUser } from "react-icons/fi";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { useSession } from "next-auth/react";
-import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
-import toast from "react-hot-toast";
 import avatar from "../../public/assests/download5.png";
 import Image from "next/image";
-import Marquee from "react-fast-marquee";
-//import MarqueeButton from "../styles/MarqueeButton";
 type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -24,30 +14,15 @@ type Props = {
   setRoute: (route: string) => void;
 };
 
-const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
+const Header: FC<Props> = ({ activeItem, setOpen }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
-  const { data } = useSession();
-  const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
 
-  //this is only use for image bcz when i update image need one refresh for update reflacte solve this issue
+  //this is only use for image bcz when i update image need one refresh for update reflacte 
   const storeUser = useSelector((state: any) => state.user.user);
 
-  useEffect(() => {
-    if (!user) {
-      if (data) {
-        socialAuth({
-          email: data?.user?.email,
-          name: data?.user?.name,
-          avatar: data?.user?.image,
-        });
-      }
-    }
-    if (isSuccess) {
-      toast.success("Login Successfully");
-    }
-  }, [data, user]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,13 +51,10 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     }
   };
 
-  const handleUserIconClick = () => {
-    setOpenSidebar(false);
-    setOpen(true);
-  };
+
 
   return (
-    <div className="w-full bg-[#DDE6ED] dark:bg-[#27374D] relative py-0">
+    <div className="w-full dark:bg-[#27374D] bg-white dark:bg-[ba] relative py-0">
       <div
         className={`${
           active
@@ -123,7 +95,6 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                 />
               </div>
 
-              {user ? (
                 <Link href={"/profile"}>
                   <Image
                     src={storeUser?.avatar?.url || avatar}
@@ -136,22 +107,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                     }}
                   />
                 </Link>
-              ) : (
-                <div className="ml-4" onClick={handleUserIconClick}>
-                  <button className="relative hidden 800px:block items-center px-6 py-3 overflow-hidden font-medium transition-all bg-gray-500 rounded-md group">
-                    <span className="absolute top-0 right-0 inline-block w-4 h-4 transition-all duration-500 ease-in-out bg-gray-700 rounded group-hover:-mr-4 group-hover:-mt-4">
-                      <span className="absolute top-0 right-0 w-5 h-5 rotate-45 translate-x-1/2 -translate-y-1/2 bg-white"></span>
-                    </span>
-                    <span className="absolute bottom-0 rotate-180 left-0 inline-block w-4 h-4 transition-all duration-500 ease-in-out bg-gray-700 rounded group-hover:-ml-4 group-hover:-mb-4">
-                      <span className="absolute top-0 right-0 w-5 h-5 rotate-45 translate-x-1/2 -translate-y-1/2 bg-white"></span>
-                    </span>
-                    <span className="absolute bottom-0 left-0 w-full h-full transition-all duration-500 ease-in-out delay-200 -translate-x-full bg-gray-700 rounded-md group-hover:translate-x-0"></span>
-                    <span className="relative w-full text-left text-white transition-colors duration-200 ease-in-out group-hover:text-white">
-                      LOGIN
-                    </span>
-                  </button>
-                </div>
-              )}
+              
             </div>
           </div>
         </div>
@@ -182,34 +138,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
         )}
       </div>
 
-      {/* Authentication Modals  */}
-      {route === "Login" && open && (
-        <CustomModel
-          open={open}
-          setOpen={setOpen}
-          setRoute={setRoute}
-          activeItem={activeItem}
-          component={Login}
-        />
-      )}
-      {route === "Sign-Up" && open && (
-        <CustomModel
-          open={open}
-          setOpen={setOpen}
-          setRoute={setRoute}
-          activeItem={activeItem}
-          component={SignUp}
-        />
-      )}
-      {route === "Verification" && open && (
-        <CustomModel
-          open={open}
-          setOpen={setOpen}
-          setRoute={setRoute}
-          activeItem={activeItem}
-          component={Verification}
-        />
-      )}
+     
     </div>
   );
 };
