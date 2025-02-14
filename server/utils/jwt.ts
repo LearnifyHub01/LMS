@@ -77,6 +77,7 @@ export const sendToken = async (
       role: user.role,
       isVerified: user.isVerified,
       avatar: user.avatar,
+      courses:user.courses
     },
     refreshToken,
     ipAddress,
@@ -94,7 +95,7 @@ export const sendToken = async (
     sessionKey,
     JSON.stringify(sessionData),
     "EX",
-     60
+    7 * 24 * 60 * 60 * 1000
   );
   await sessionQueue.add("remove-session", { userId: user._id, sessionKey }, { delay: 604800000 });
   res.cookie("session_id", sessionId, {

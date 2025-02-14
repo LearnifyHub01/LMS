@@ -12,6 +12,7 @@ import {
   FaUsers,
   FaChartBar,
   FaSignOutAlt,
+
 } from "react-icons/fa";
 import Link from "next/link";
 import { useSelector } from "react-redux";
@@ -30,14 +31,16 @@ interface ItemsProps {
 
 const Item: FC<ItemsProps> = ({ title, to, icon, selected, setSelected }) => {
   return (
-    <MenuItem
-      active={selected === title}
-      onClick={() => setSelected(title)}
-      icon={icon}
-    >
-      <Typography className="!text-[16px] !font-Poppins">{title}</Typography>
-      <Link href={to} />
-    </MenuItem>
+    <Link href={to} passHref legacyBehavior>
+  <MenuItem
+    component="a" // Ensures that the item is wrapped in an anchor tag
+    active={selected === title}
+    onClick={() => setSelected(title)}
+    icon={icon}
+  >
+    <Typography className="!text-[16px] !font-Poppins">{title}</Typography>
+  </MenuItem>
+</Link>
   );
 };
 
@@ -47,7 +50,7 @@ const AdminSidebar = () => {
   const [isCollapsed, isSetCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [mounted, setMounted] = useState(false);
-  const {theme, setTheme} = useTheme();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => setMounted(true), []);
 
@@ -64,7 +67,7 @@ const AdminSidebar = () => {
       <div className="h-screen flex">
         <Sidebar
           collapsed={isCollapsed}
-          className="bg-gray-800 text-black shadow-md overflow-hidden"
+          className="bg-blue-600 text-black shadow-md overflow-hidden"
         >
           <Menu>
             {/* Toggle Button at the Top */}
@@ -81,15 +84,11 @@ const AdminSidebar = () => {
               <Box mb="25px">
                 <Box display="flex" justifyContent="center" alignItems="center">
                   <Image
-                    alt="profile-user"
-                    width={90}
-                    height={90}
                     src={user.avatar ? user.avatar.url : avatarDefault}
-                    style={{
-                      cursor: "pointer",
-                      borderRadius: "50%",
-                      border: "3px solid #5b6e6",
-                    }}
+                    alt="Profile Picture"
+                    width={20}
+                    height={20}
+                    className="h-[120px] w-[120px] object-cover border-2 border-[black] rounded-full shadow-lg"
                   />
                 </Box>
                 <Box textAlign="center">
@@ -152,7 +151,7 @@ const AdminSidebar = () => {
             >
               <Item
                 title="Create Course"
-                to="/content/create-course"
+                to="/admin/create-course"
                 icon={<FaBook />}
                 selected={selected}
                 setSelected={setSelected}
@@ -171,7 +170,7 @@ const AdminSidebar = () => {
               label="Customization"
               icon={<FaCog />}
               className="text-black"
-              defaultOpen={false} 
+              defaultOpen={false}
             >
               <Item
                 title="Hero"
@@ -271,4 +270,4 @@ const AdminSidebar = () => {
   );
 };
 
-export default AdminSidebar;
+export default AdminSidebar;

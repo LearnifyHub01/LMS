@@ -29,4 +29,4 @@ const Page = (props: Props) => {
   );
 };
 
-export default Page;
+export default Page;

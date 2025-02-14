@@ -1,15 +1,16 @@
-import mongoose ,{Document, Model,Schema} from "mongoose";
+import mongoose ,{Document, Model,Schema, Types} from "mongoose";
+import { IUser } from "./user.model";
 
 
 
 interface IComment extends Document{
-    user:object,
-    comment:string,
-    commentReplies : IComment[]
+    user:IUser,
+    question:string,
+    questionReplies : IComment[]
 }
 
 interface IReview extends Document{
-    user:object,
+    user:IUser,
     rating:number,
     comment:string,
     commentReplies:IComment[]
@@ -33,7 +34,8 @@ interface ICourseData extends Document{
     questions:IComment[]
 }
 
-interface ICource extends Document{
+export interface ICourse extends Document{
+    _id: Types.ObjectId; 
     name:string,
     description:string,
     price:number,
@@ -56,7 +58,8 @@ const reviewSchema = new Schema<IReview>({
         type:Number,
         default:0
     },
-    comment:String
+    comment:String,
+    commentReplies : [Object]
 })
 
 const linkSchema = new Schema<ILink>({
@@ -66,8 +69,8 @@ const linkSchema = new Schema<ILink>({
 
 const commentSchema = new Schema<IComment>({
     user:Object,
-    comment:String,
-    commentReplies:[Object]
+    question:String,
+    questionReplies:[Object]
 })
 
 const courseDataSchema = new Schema<ICourseData>({
@@ -82,7 +85,7 @@ const courseDataSchema = new Schema<ICourseData>({
     questions:[commentSchema]
 })
 
-const courseSchema = new Schema<ICource>({
+const courseSchema = new Schema<ICourse>({
     name:{
         type:String,
         required:true
@@ -134,5 +137,5 @@ const courseSchema = new Schema<ICource>({
     }
 })
 
-const CourseModel:Model<ICource> = mongoose.model('Course',courseSchema)
+const CourseModel:Model<ICourse> = mongoose.model('Course',courseSchema)
 export default CourseModel
