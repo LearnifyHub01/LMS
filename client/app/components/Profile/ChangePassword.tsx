@@ -68,7 +68,7 @@ const ChangePassword: FC<Props> = ({ user }) => {
       {/* Main Box Container */}
       <div className="max-w-[1400px] top-0 w-full border border-gray-300 dark:border-gray-700  bg-white dark:bg-[#27374D] flex">
         {/* Left Side: Profile Card (Full Height) */}
-        <div className="w-[30%] border-r border-gray-300 dark:border-gray-700 p-4 flex flex-col h-full">
+        <div className="w-[30%] border-r bg-blue-300 border-gray-300 dark:border-gray-700 p-4 flex flex-col h-full">
           <div className="w-full text-center flex flex-col items-center justify-start space-y-4">
             {/* Avatar Section */}
             <div className="relative w-20 top-2 h-20 mx-auto">

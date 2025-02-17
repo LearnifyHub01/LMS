@@ -86,57 +86,63 @@ const courseDataSchema = new Schema<ICourseData>({
 })
 
 const courseSchema = new Schema<ICourse>({
-    name:{
-        type:String,
-        required:true
+    name: {
+      type: String,
+      required: true, // Required field
     },
-    description:{
-        type:String,
-        required:true
+    description: {
+      type: String,
+      required: true, // Required field
     },
-    price:{
-        type:Number,
-        required:true
+    price: {
+      type: Number,
+      required: true, // Required field
     },
-    estimatedPrice:{
-        type:Number
+    estimatedPrice: {
+      type: Number, // Optional field
     },
-    thumbnail:{
-    
-        public_id:{
-          type:String,
-          
-        },
-        url:{
-            type:String,
-           
-        }
+    thumbnail: {
+      public_id: {
+        type: String, // Store the Cloudinary public ID for the image
+      },
+      url: {
+        type: String, // Store the URL of the thumbnail
+      },
     },
-    tags:{
-        type:String,
-        required:true
+    tags: {
+      type: String,
+      required: true, // Required field
     },
-    level:{
-        type:String,
-        required:true
+    level: {
+      type: String,
+      required: true, // Required field
     },
-    demoUrl:{
-        type:String,
-        required:true
+    demoUrl: {
+      type: String,
+      required: true, // Required field
     },
-    benefits:[{title:String}],
-    prerequisites:[{title:String}],
-    reviews:[reviewSchema],
-    courseData:[courseDataSchema],
-    ratings:{
-        type:Number,
-        default:0
+    benefits: [{
+      title: {
+        type: String, // Benefit title (optional array of titles)
+      },
+    }],
+    prerequisites: [{
+      title: {
+        type: String, // Prerequisite title (optional array of titles)
+      },
+    }],
+    reviews: [reviewSchema], // Reference to the review schema
+    courseData: [courseDataSchema], // Reference to the course data schema
+    ratings: {
+      type: Number,
+      default: 0, // Default rating is 0
     },
-    purchased:{
-        type:Number,
-        default:0
-    }
-},{timestamps:true})
+    purchased: {
+      type: Number,
+      default: 0, // Default purchased count is 0
+    },
+  }, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
+
 
 const CourseModel:Model<ICourse> = mongoose.model('Course',courseSchema)
 export default CourseModel

@@ -67,7 +67,11 @@ const AdminSidebar = () => {
       <div className="h-screen flex">
         <Sidebar
           collapsed={isCollapsed}
-          className="bg-blue-600 text-black shadow-md overflow-hidden"
+          className="bg-[#eeeee4] text-black shadow-md overflow-hidden custom-sidebar"
+          style={{
+            width:isCollapsed ? '60px':'250px',
+            transition: 'width 0.3s ease-in'
+          }}
         >
           <Menu>
             {/* Toggle Button at the Top */}

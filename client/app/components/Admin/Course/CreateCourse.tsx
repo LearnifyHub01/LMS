@@ -111,12 +111,10 @@ const CreateCourse = (props: Props) => {
     const data = courseData
     console.log("📤 Sending Data to Backend:", data); 
     if(!isLoading){
-      await createCourse(courseData)
+      await createCourse(data)
     }
   }
-
- 
-
+  
   return (
     <div className="w-full flex min-h-screen">
       {/* Main Content */}
