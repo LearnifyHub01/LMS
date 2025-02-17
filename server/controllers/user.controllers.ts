@@ -464,7 +464,6 @@ export const updateAccessToken = CatchAsyncError(
     try {
       const refresh_token = req.cookies.refresh_token as string;
       const sessionId = req.cookies.session_id; // Get session ID from cookie
-      console.log("session id is", sessionId);
 
       if (!refresh_token || !sessionId) {
         return next(
@@ -483,11 +482,11 @@ export const updateAccessToken = CatchAsyncError(
         return next(new ErrorHandler("Invalid or expired refresh token", 400));
       }
 
-      const userId = decoded.id;
+        const userId = decoded.id;
       const user = await userModel.findById(userId);
 
       if (!user) {
-        return next(new ErrorHandler("User not found", 404));
+        return next(new ErrorHandler('please login for access this resource', 400));
       }
 
       const sessionKey = `session:${userId}:${sessionId}`;
@@ -518,6 +517,7 @@ export const updateAccessToken = CatchAsyncError(
 
       res.cookie("access_token", accessToken, accessTokenOptions);
       res.cookie("refresh_token", newRefreshToken, refreshTokenOptions);
+  
 
       // 4️⃣ Update refresh token in MongoDB for the correct session
 

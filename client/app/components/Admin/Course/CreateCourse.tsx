@@ -1,13 +1,38 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CourseInformation from "./CourseInformation";
 import CourseOption from "./CourseOption";
 import CourseData from "./CourseData";
 import CourseContent from "./CourseContent";
-import { title } from "process";
+import { useRouter } from "next/navigation";
 import CoursePreview from "./CoursePreview";
+import { useCreateCourseMutation } from "@/redux/features/courses/coursesApi";
+import toast from "react-hot-toast";
+import { redirect } from "next/navigation";
+
+
 type Props = {};
 const CreateCourse = (props: Props) => {
+  const [createCourse , {isLoading , isSuccess ,error }]=useCreateCourseMutation()
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Course Created Successfully");
+      setTimeout(() => {
+        router.push("/admin/all-courses");
+      }, 0);
+    }
+  
+    if (error) {
+      console.log("Error Object:", error); // 🔍 Debug the error structure
+      if ("data" in error) {
+        const errorMessage = typeof error.data === "string" ? error.data : JSON.stringify(error.data);
+        toast.error(errorMessage);
+      }
+    }
+  }, [isSuccess, error]);
+  
   const [active, setActive] = useState(0);
   const [courseInfo, setCourseInfo] = useState({
     name: "",
@@ -79,12 +104,19 @@ const CreateCourse = (props: Props) => {
     };
 
     setCourseData(data);
+   
+  return data
   };
-
   const handleCourseCreate = async(e:any) => {
     const data = courseData
-
+    console.log("📤 Sending Data to Backend:", data); 
+    if(!isLoading){
+      await createCourse(courseData)
+    }
   }
+
+ 
+
   return (
     <div className="w-full flex min-h-screen">
       {/* Main Content */}

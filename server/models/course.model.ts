@@ -39,7 +39,7 @@ export interface ICourse extends Document{
     name:string,
     description:string,
     price:number,
-    estimatedPrice?:number,
+    estimatedPrice:number,
     thumbnail:object,
     tags:string,
     level:string,
@@ -102,8 +102,9 @@ const courseSchema = new Schema<ICourse>({
         type:Number
     },
     thumbnail:{
+    
         public_id:{
-            type:String,
+          type:String,
           
         },
         url:{
@@ -135,7 +136,7 @@ const courseSchema = new Schema<ICourse>({
         type:Number,
         default:0
     }
-})
+},{timestamps:true})
 
 const CourseModel:Model<ICourse> = mongoose.model('Course',courseSchema)
 export default CourseModel

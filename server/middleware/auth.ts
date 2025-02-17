@@ -58,7 +58,7 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     if (!sessionData) {
       return next(new ErrorHandler("Session expired or invalid", 401));
     }
-
+    
     req.user = JSON.parse(sessionData).sessionUser; // Attach user info to request
     
     next();

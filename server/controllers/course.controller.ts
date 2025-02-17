@@ -11,6 +11,7 @@ import path from "path";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
 import { getAllUsersService } from "../services/user.service";
+import axios from "axios";
 
 //upload course
 export const uploadCourse = CatchAsyncError(
@@ -18,6 +19,7 @@ export const uploadCourse = CatchAsyncError(
     try {
       const data = req.body;
       const thumbnail = data.thumbnail;
+      console.log('data is',data)
 
       if (thumbnail) {
         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
@@ -88,7 +90,8 @@ export const getSingleCourse = CatchAsyncError(
         const course = await CourseModel.findById(req.params.id).select(
           "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
         );
-        await redis.set(courseId, JSON.stringify(course));
+        //course not use that much it will automatically deleted
+        await redis.set(courseId, JSON.stringify(course),'EX',604800);
         res.status(200).json({
           succcess: true,
           course,
@@ -431,3 +434,27 @@ export const deleteCourse = CatchAsyncError(
     }
   }
 );
+
+
+//generate video url
+export const generateVideoUrl = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const {videoId} = req.body
+      const response = await axios.post(
+        `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
+        {ttl: 3600},
+        {
+          headers:{
+            Accept:'application/json',
+            'Content-Type':'application/json',
+            Authorization:`Apisecret ${process.env.VDOCIPHER_API_SECRET}`
+          }
+        }
+      )
+      res.json(response.data )
+    } catch (error:any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+
+  })

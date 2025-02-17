@@ -4,7 +4,7 @@ import React, { FC, useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineDelete, AiOutlinePlusCircle } from "react-icons/ai";
 import { BiSolidPencil } from "react-icons/bi";
-import {BsLink45Deg} from 'react-icons/bs'
+import { BsLink45Deg } from "react-icons/bs";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 type Props = {
   active: number;
@@ -40,80 +40,90 @@ const CourseContent: FC<Props> = ({
     updatedData[index].links.splice(linkIndex, 1);
     setCourseContentData(updatedData);
   };
-  
 
-  const handleAddLink = (index:number)=>{
-        const updatedData = [...courseContentData]
-        updatedData[index].links.push({title:'',url:''})
-        setCourseContentData(updatedData)
-  }
+  const handleAddLink = (index: number) => {
+    const updatedData = [...courseContentData];
+    updatedData[index].links.push({ title: "", url: "" });
+    setCourseContentData(updatedData);
+  };
 
-  const addNewSection = () =>{
-    if(
-        courseContentData[courseContentData.length - 1].title === ""||
-        courseContentData[courseContentData.length - 1].description === ""||
-        courseContentData[courseContentData.length - 1].videoUrl === ""||
-        courseContentData[courseContentData.length - 1].links[0].title === ""||
-        courseContentData[courseContentData.length - 1].links[0].url === ""
-    ){
-        toast.error('please fill all the field first')
-    }else{
-        setActiveSection(activeSection+1)
-        const newContent ={
-            videoUrl :'',
-            title:'',
-            description:'',
-            videoSection :`Untitled Section ${activeSection}`,
-            links:[{title:'',url:''}]
-        }
-        setCourseContentData([...courseContentData,newContent])
-        
+  const addNewSection = () => {
+    if (
+      courseContentData[courseContentData.length - 1].title === "" ||
+      courseContentData[courseContentData.length - 1].description === "" ||
+      courseContentData[courseContentData.length - 1].videoUrl === "" ||
+      courseContentData[courseContentData.length - 1].links[0].title === "" ||
+      courseContentData[courseContentData.length - 1].links[0].url === ""
+    ) {
+      toast.error("please fill all the field first");
+    } else {
+      setActiveSection(activeSection + 1);
+      const newContent = {
+        videoUrl: "",
+        title: "",
+        description: "",
+        videoSection: `Untitled Section ${activeSection}`,
+        links: [{ title: "", url: "" }],
+      };
+      setCourseContentData([...courseContentData, newContent]);
     }
-  }
+  };
 
-  const newContentHandler = (item:any)=>{
-    if(item.title === '' || item.description === "" || item.videoUrl==='' || item.links[0].url===''){
-        toast.error("please fill all the fields first")
-    }else{
-        let newVideoSection = ''
+  const newContentHandler = (item: any) => {
+    if (
+      item.title === "" ||
+      item.description === "" ||
+      item.videoUrl === "" ||
+      item.links[0].url === ""
+    ) {
+      toast.error("please fill all the fields first");
+    } else {
+      let newVideoSection = "";
 
-        if(courseContentData.length>0){
-            const lastVideoSection = courseContentData[courseContentData.length-1].videoSection
+      if (courseContentData.length > 0) {
+        const lastVideoSection =
+          courseContentData[courseContentData.length - 1].videoSection;
 
-            if(lastVideoSection){
-                newVideoSection = lastVideoSection
-            }
+        if (lastVideoSection) {
+          newVideoSection = lastVideoSection;
         }
-        const newContent ={
-            videoUrl :'',
-            title:'',
-            description:'',
-            videoSection :newVideoSection,
-            links:[{title:'',url:''}]
-        }
-        setCourseContentData([...courseContentData,newContent])
+      }
+      // const newContent ={
+      //     videoUrl :'',
+      //     title:'',
+      //     description:'',
+      //     videoSection :newVideoSection,
+      //     links:[{title:'',url:''}]
+      // }
+      const newContent = {
+        videoUrl: "",
+        title: "",
+        description: "",
+        videoSection: `Untitled Section ${activeSection}`,
+        links: [{ title: "", url: "" }],
+      };
+      setCourseContentData([...courseContentData, newContent]);
     }
-
-  }
+  };
 
   const prevButton = () => {
     setActive(active - 1);
-  }; 
-  
-  const handleOptions = () =>{
-    if(
-        courseContentData[courseContentData.length - 1].title === ""||
-        courseContentData[courseContentData.length - 1].description === ""||
-        courseContentData[courseContentData.length - 1].videoUrl === ""||
-        courseContentData[courseContentData.length - 1].links[0].title === ""||
-        courseContentData[courseContentData.length - 1].links[0].url === ""
-    ){
-        toast.error("Section can't be empty")
-    }else{
-        setActive(active+1)
-        handleCourseSubmit()
+  };
+
+  const handleOptions = () => {
+    if (
+      courseContentData[courseContentData.length - 1].title === "" ||
+      courseContentData[courseContentData.length - 1].description === "" ||
+      courseContentData[courseContentData.length - 1].videoUrl === "" ||
+      courseContentData[courseContentData.length - 1].links[0].title === "" ||
+      courseContentData[courseContentData.length - 1].links[0].url === ""
+    ) {
+      toast.error("Section can't be empty");
+    } else {
+      setActive(active + 1);
+      handleCourseSubmit();
     }
-  }
+  };
 
   return (
     <div className="w-[82%] m-auto mt-24 p-3">
@@ -123,7 +133,7 @@ const CourseContent: FC<Props> = ({
             index == 0 ||
             item.videoSection !== courseContentData[index - 1].videoSection;
           return (
-            <> 
+            <>
               <div
                 className={`w-full bg-[#cdc8c818] p-4 ${
                   showSectionInput ? "mt-10" : "mb-0"
@@ -211,11 +221,22 @@ const CourseContent: FC<Props> = ({
 
                     <div className="mb-3">
                       <label className={styles.label}>Video Url</label>
-                      <input
+                      {/* <input
                         type="text"
                         placeholder="sdder"
                         className={styles.input}
                         value={item.videoUrl}
+                        onChange={(e) => {
+                          const updatedData = [...courseContentData];
+                          updatedData[index].videoUrl = e.target.value;
+                          setCourseContentData(updatedData);
+                        }}
+                      /> */}
+                      <input
+                        type="text"
+                        placeholder="Video URL..."
+                        className={styles.input}
+                        value={item.videoUrl || ""} // Ensures no undefined value
                         onChange={(e) => {
                           const updatedData = [...courseContentData];
                           updatedData[index].videoUrl = e.target.value;
@@ -246,12 +267,16 @@ const CourseContent: FC<Props> = ({
                             Link {linkIndex + 1}
                           </label>
                           <AiOutlineDelete
-                           className={`${
-                            linkIndex === 0 ? "cursor-not-allowed" : "cursor-pointer"
-                          } text-black dark:text-white text-[20px]`}
-                          onClick={() =>
-                            linkIndex === 0 ? null : handleRemoveLink(index, linkIndex)
-                          }
+                            className={`${
+                              linkIndex === 0
+                                ? "cursor-not-allowed"
+                                : "cursor-pointer"
+                            } text-black dark:text-white text-[20px]`}
+                            onClick={() =>
+                              linkIndex === 0
+                                ? null
+                                : handleRemoveLink(index, linkIndex)
+                            }
                           />
                         </div>
                         <input
@@ -282,37 +307,38 @@ const CourseContent: FC<Props> = ({
                     ))}
                     <br />
                     <div className="inline-block mb-4">
-                        <p className="flex items-center text-[18px] dark:text-white cursor-pointer"
-                        onClick={()=>handleAddLink(index)}>
-                            <BsLink45Deg className='mr-2'/> Add Link
-                        </p>
-                        
+                      <p
+                        className="flex items-center text-[18px] dark:text-white cursor-pointer"
+                        onClick={() => handleAddLink(index)}
+                      >
+                        <BsLink45Deg className="mr-2" /> Add Link
+                      </p>
                     </div>
                   </>
                 )}
                 <br />
                 {/**add new content */}
-                {
-                    index === courseContentData.length - 1 && (
-                        <div>
-                            <p
-                            className="flex items-center text-[18px] dark:text:white text:black cursor-pointer"
-                            onClick={(e:any)=>newContentHandler(item)}
-                            >
-                                <AiOutlinePlusCircle className="mr-2"/> Add New Content
-
-                            </p>
-                        </div>
-                    )
-                }
+                {index === courseContentData.length - 1 && (
+                  <div>
+                    <p
+                      className="flex items-center text-[18px] dark:text:white text:black cursor-pointer"
+                      onClick={(e: any) => newContentHandler(item)}
+                    >
+                      <AiOutlinePlusCircle className="mr-2" /> Add New Content
+                    </p>
+                  </div>
+                )}
               </div>
             </>
           );
         })}
-        <br/>
-        <div className="flex items-center text-[20px] dark:text-white text:black cursor-pointer"
-        onClick={()=>addNewSection()}>
-            <AiOutlinePlusCircle className="mr-2"/>Add New Section
+        <br />
+        <div
+          className="flex items-center text-[20px] dark:text-white text:black cursor-pointer"
+          onClick={() => addNewSection()}
+        >
+          <AiOutlinePlusCircle className="mr-2" />
+          Add New Section
         </div>
       </form>
       <br />
@@ -323,14 +349,16 @@ const CourseContent: FC<Props> = ({
         >
           prev
         </button>
-        <button   className="w-full 800px:w-[180px] h-[40px] bg-[#37a39a] text-center text-[#fff] rounded mt-8 cursor-pointer"
-          onClick={() => handleOptions()}>
-            Next
+        <button
+          className="w-full 800px:w-[180px] h-[40px] bg-[#37a39a] text-center text-[#fff] rounded mt-8 cursor-pointer"
+          onClick={() => handleOptions()}
+        >
+          Next
         </button>
       </div>
       <br />
       <br />
-      <br /> 
+      <br />
     </div>
   );
 };
