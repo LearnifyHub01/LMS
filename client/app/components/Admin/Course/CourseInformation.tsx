@@ -55,7 +55,7 @@ const CourseInformation: FC<Props> = ({
     }
   };
   return (
-    <div className="w-[82%] m-auto mt-24 p-3">
+    <div className="w-[100%] p-3 ml-2">
       <form onSubmit={handleSubmit} className={`${styles.label}`}>
         <div>
           <label htmlFor="" className={`${styles.label}`}>
@@ -195,7 +195,7 @@ const CourseInformation: FC<Props> = ({
           />
           <label
             htmlFor="file"
-            className={`w-full min-h-[10vh] dark:border:white border-[#00000026] p-3 border flex items-center justify-center ${
+            className={`w-full min-h-[10vh] dark:border:white border-[#00000026] p-3 border flex items-center justify-center border-white ${
               dragging ? "bg-blue-500" : "bg-transparent"
             }`}
             onDragOver={handleDragOver}

@@ -19,10 +19,8 @@ const Header: FC<Props> = ({ activeItem, setOpen }) => {
   const [openSidebar, setOpenSidebar] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
 
-  //this is only use for image bcz when i update image need one refresh for update reflacte 
+  //this is only use for image bcz when i update image need one refresh for update reflacte
   const storeUser = useSelector((state: any) => state.user.user);
-
-
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,10 +49,8 @@ const Header: FC<Props> = ({ activeItem, setOpen }) => {
     }
   };
 
-
-
   return (
-    <div className="w-full dark:bg-[#27374D] bg-white dark:bg-[ba] relative py-0">
+    <div className="w-full bg-[#FAF9F6] dark:bg-[#1C1C1C] sticky z-50 top-0">
       <div
         className={`${
           active
@@ -95,19 +91,18 @@ const Header: FC<Props> = ({ activeItem, setOpen }) => {
                 />
               </div>
 
-                <Link href={"/profile"}>
-                  <Image
-                    src={storeUser?.avatar?.url || avatar}
-                    alt="Profile Picture"
-                    height={4000}
-                    width={3000}
-                    className="w-[30px] h-[30px] rounded-full ml-5 hidden 800px:block cursor-pointer object-cover"
-                    style={{
-                      border: activeItem === 5 ? "2px solid #37a39a" : "none",
-                    }}
-                  />
-                </Link>
-              
+              <Link href={"/profile"}>
+                <Image
+                  src={storeUser?.avatar?.url || avatar}
+                  alt="Profile Picture"
+                  height={4000}
+                  width={3000}
+                  className="w-[30px] h-[30px] rounded-full ml-5 hidden 800px:block cursor-pointer object-cover"
+                  style={{
+                    border: activeItem === 5 ? "2px solid #37a39a" : "none",
+                  }}
+                />
+              </Link>
             </div>
           </div>
         </div>
@@ -137,10 +132,8 @@ const Header: FC<Props> = ({ activeItem, setOpen }) => {
           </div>
         )}
       </div>
-
-     
     </div>
   );
 };
 
-export default Header;
+export default Header;

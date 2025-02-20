@@ -13,6 +13,7 @@ import { signOut } from "next-auth/react";
 import avatar from "../../public/assests/download5.png";
 import { useSelector } from "react-redux";
 import { RiAdminFill } from "react-icons/ri";
+import { Dashboard,School,Lock,Memory} from  "@mui/icons-material"
 
 export const NavItemsData = [
   { name: "Home", url: "/" },
@@ -163,10 +164,22 @@ const NavItems: React.FC<Props> = ({
                         activeItem === 2
                           ? "text-[crimson] dark:text-[#2bd576]"
                           : "text-black dark:text-white"
-                      } flex items-center p-2 rounded-lg cursor-pointer`}
+                      } flex items-center p-2 rounded-lg cursor-pointer gap-2`}
                     >
                       <FaUser size={20} className="mr-2" />
                       Profile
+                    </li>
+                  </Link>
+                  <Link href="/admin">
+                    <li
+                      className={`${
+                        activeItem === 2
+                          ? "text-[crimson] dark:text-[#2bd576]"
+                          : "text-black dark:text-white"
+                      } flex items-center p-2 rounded-lg cursor-pointer gap-2`}
+                    >
+                      <Dashboard />
+                      Admin Dashboard
                     </li>
                   </Link>
                   <li
@@ -174,9 +187,10 @@ const NavItems: React.FC<Props> = ({
                       activeItem === 3
                         ? "text-[crimson] dark:text-[#2bd576]"
                         : "text-black dark:text-white"
-                    } flex items-center p-2 rounded-lg cursor-pointer`}
+                    } flex items-center p-2 rounded-lg cursor-pointer gap-2`}
+                  
                   >
-                    <FaChalkboardTeacher size={20} className="mr-2" />
+                    <School />
                     Enrolled Courses
                   </li>
 
@@ -186,9 +200,9 @@ const NavItems: React.FC<Props> = ({
                         activeItem === 2
                           ? "text-[crimson] dark:text-[#2bd576]"
                           : "text-black dark:text-white"
-                      } flex items-center p-2 rounded-lg cursor-pointer`}
+                      } flex items-center p-2 rounded-lg cursor-pointer gap-2`}
                     >
-                      <FaUnlockAlt size={20} className="mr-2" />
+                      <Lock  />
                       Change Password
                     </li>
                   </Link>
@@ -198,25 +212,15 @@ const NavItems: React.FC<Props> = ({
                         activeItem === 2
                           ? "text-[crimson] dark:text-[#2bd576]"
                           : "text-black dark:text-white"
-                      } flex items-center p-2 rounded-lg cursor-pointer`}
+                      } flex items-center p-2 rounded-lg cursor-pointer gap-2`}
                     >
-                        <RiAdminFill  size={20} className="mr-2" />
+                        <Memory />
                       Device Info
                     </li>
                   </Link>
 
             
-                  <li
-                    className={`${
-                      activeItem === 4
-                        ? "text-[crimson] dark:text-[#2bd576]"
-                        : "text-black dark:text-white"
-                    } flex items-center p-2 rounded-lg cursor-pointer`}
-                    onClick={logOutHandler}
-                  >
-                    <MdLogout size={20} className="mr-2" />
-                    Log Out
-                  </li>
+              
                 </ul>
               </div>
             </details>

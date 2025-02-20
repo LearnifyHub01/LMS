@@ -28,7 +28,7 @@ const emailRegexPattern: RegExp =
     hostName: { type: String, required: true, default: "Unknown Host" },
     os:{type: String, required: true },
     sessionKey:{type: String, required: true},
-    loginTime: { type: Date, default: Date.now }
+    loginTime: { type: Date, default: Date.now,expires:'7d' }
   })
 export interface IUser extends Document {
   _id:string
@@ -92,6 +92,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
   },
   { timestamps: true }
 );
+userSchema.index({ "sessions.loginTime": 1 }, { expireAfterSeconds: 604800 });
 
 
 

@@ -126,7 +126,7 @@ const CourseContent: FC<Props> = ({
   };
 
   return (
-    <div className="w-[82%] m-auto mt-24 p-3">
+    <div className="w-[100%] ml-2 p-2">
       <form onSubmit={handleSubmit}>
         {courseContentData.map((item: any, index: number) => {
           const showSectionInput =
@@ -321,10 +321,10 @@ const CourseContent: FC<Props> = ({
                 {index === courseContentData.length - 1 && (
                   <div>
                     <p
-                      className="flex items-center text-[18px] dark:text:white text:black cursor-pointer"
+                      className="flex items-center text-[18px] dark:text-white cursor-pointer"
                       onClick={(e: any) => newContentHandler(item)}
                     >
-                      <AiOutlinePlusCircle className="mr-2" /> Add New Content
+                      <AiOutlinePlusCircle className="mr-2 text-black dark:text-white" /> Add New Content
                     </p>
                   </div>
                 )}

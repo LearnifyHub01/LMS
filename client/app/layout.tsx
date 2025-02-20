@@ -75,6 +75,7 @@ import { SocketProvider } from "@/context/SocketProvider";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 
+
 const poppins = Poppins({
   subsets: ["latin", "latin-ext"],
   variable: "--font-poppins",
@@ -97,6 +98,7 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${josefin.variable} !bg-white bg-no-repeat dark:bg-gradient-to-b dark:from-gray-900 dark:to-black duration-300`}
       >
+
         <Providers>
           <SessionProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

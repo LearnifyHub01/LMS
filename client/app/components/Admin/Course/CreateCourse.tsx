@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import CoursePreview from "./CoursePreview";
 import { useCreateCourseMutation } from "@/redux/features/courses/coursesApi";
 import toast from "react-hot-toast";
-import { redirect } from "next/navigation";
+import Header from '../Header'
 
 
 type Props = {};
@@ -116,9 +116,11 @@ const CreateCourse = (props: Props) => {
   }
   
   return (
-    <div className="w-full flex min-h-screen">
+    <div className="w-full flex min-h-screen dark:bg-[#151632]">
       {/* Main Content */}
       <div className="w-[80%]">
+      <Header title="Create Course" subtitle="Welcome to dashboard"/>
+        <CourseOption active={active} setActive={setActive} />
         {active === 0 && (
           <CourseInformation
             courseInfo={courseInfo}
@@ -161,9 +163,7 @@ const CreateCourse = (props: Props) => {
       </div>
 
       {/* Fixed Course Option at the Right End */}
-      <div className="fixed right-0  mt-[100px] top-0 h-screen w-[20%] flex items-start justify-start">
-        <CourseOption active={active} setActive={setActive} />
-      </div>
+   
     </div>
   );
 };

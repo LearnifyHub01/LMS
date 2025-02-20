@@ -51,7 +51,7 @@ const CourseData: FC<Props> = ({
     
   }
   return (
-    <div className="w-[82%] m-auto mt-24 p-3">
+    <div className="w-[100%] p-3 ml-2">
       <div>
         <label className={`${styles.label} text-[20px]`} htmlFor="email">
           What are the benefits for students in this course?
@@ -70,7 +70,9 @@ const CourseData: FC<Props> = ({
           />
         ))}
         <AddCircleOutlineIcon
+          className="text-black dark:text-white" 
           style={{ margin: "10px 0px", cursor: "pointer", width: "30px" }}
+        
           onClick={handleAddBenefits}
         />
       </div>
@@ -92,6 +94,7 @@ const CourseData: FC<Props> = ({
           />
         ))}
         <AddCircleOutlineIcon
+        className="text-black dark:text-white" 
           style={{ margin: "10px 0px", cursor: "pointer", width: "30px" }}
           onClick={handleAddprerequisites}
         />

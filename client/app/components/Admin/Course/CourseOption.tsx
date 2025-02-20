@@ -1,5 +1,4 @@
 import React, { FC } from "react";
-import { IoMdCheckmark } from "react-icons/io";
 
 type Props = {
   active: number;
@@ -14,50 +13,41 @@ const CourseOption: FC<Props> = ({ active, setActive }) => {
     "Course Preview",
   ];
 
+  // Calculate progress percentage
+  const progress = ((active + 1) / options.length) * 100;
+
   return (
-    <div>
-      {options.map((option, index) => (
-        <div key={index} className="relative flex items-start">
-          {/* Step Circle */}
-          <div className="flex flex-col items-center">
-            <div
-              className={`w-[35px] h-[35px] rounded-full flex items-center justify-center text-white 
-                ${active >= index ? "bg-blue-600" : "bg-gray-500"} relative`}
-            >
-              <IoMdCheckmark className="text-[20px]" /> 
-            </div>
-
-            {/* Progress Line (Only if not the last step) */}
-            {/* {index !== options.length - 1 && (
-              <div
-                className="w-[3px] h-[40px]"
-                style={{
-                  backgroundColor: active > index ? "#2563EB" : "#384766",
-                }}
-              ></div>
-            )} */}
-            {index !== options.length - 1 && (
-              <div
-                className={` h-[30px] w-1 ${
-                    active+1>index ? "bg-blue-600": "bg-[#384766]"
-                }` }
-                
-              ></div>
-            )}
-          </div>
-
-          {/* Step Title */}
-          <h5
-            className={`pl-3 text-lg font-semibold ${
+    <div className=" top-0 z-50 p-4">
+      {/* Progress Bar */}
+      <div className="mt-4 flex justify-between">
+        {options.map((option, index) => (
+          <p
+            key={index}
+            className={`text-sm font-semibold ${
               active >= index ? "text-blue-600" : "text-gray-400"
             }`}
           >
             {option}
-          </h5>
-        </div>
-      ))}
+          </p>
+        ))}
+      </div>
+      <div className="relative w-full bg-gray-300 h-3 rounded-lg overflow-hidden">
+        <div
+          className="h-full bg-blue-600 transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        ></div>
+      </div>
+
+      {/* Progress Percentage */}
+      <p className="text-right text-sm font-medium text-[#70d8bd]">
+        {progress}% Complete
+      </p>
+
+      {/* Steps (Without Circles) */}
+
     </div>
   );
 };
 
 export default CourseOption;
+

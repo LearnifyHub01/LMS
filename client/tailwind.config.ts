@@ -9,6 +9,7 @@ const config:Config = {
   darkMode:["class"],
   theme: {
     extend: {
+  
       fontFamily:{
         Poppins:["var(--font-Poppins)"],
         Josefin:["var(--font-Josefin)"],
@@ -20,6 +21,7 @@ const config:Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        
       },
       screens:{
         "1000px":"1000px",

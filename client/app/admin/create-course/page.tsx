@@ -9,7 +9,7 @@ type Props={}
 
 const page = (props:Props)=>{
 return(
-  <div>
+  <div className='dark:bg-[#151632]'>
     <Heading
     title='LearnifyHub-Admin'
     description='LearnifyHub is a platform for students to learn and get help from teachers'
@@ -29,3 +29,4 @@ return(
 }
 
 export default page
+
