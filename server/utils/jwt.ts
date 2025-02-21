@@ -7,7 +7,7 @@ import { io } from "../server";
 import si from "systeminformation";
 import useragent from "express-useragent";
 import os from "os";
-import { sessionQueue } from "../queue/sessionQueue";
+
 
 interface ITokenOptions {
   expire: Date;
@@ -97,7 +97,7 @@ export const sendToken = async (
     "EX",
     7 * 24 * 60 * 60 * 1000
   );
-  await sessionQueue.add("remove-session", { userId: user._id, sessionKey }, { delay: 604800000 });
+
   res.cookie("session_id", sessionId, {
     httpOnly: true,
     sameSite: "lax",

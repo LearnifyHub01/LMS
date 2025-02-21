@@ -59,6 +59,26 @@
 // redis.on("error", (err) => console.error(" Redis connection error:", err));
 
 // export { redis };
+// import { Redis } from "ioredis";
+// import dotenv from "dotenv";
+
+// dotenv.config();
+
+// const redisUrl = process.env.REDIS_URL;
+
+// if (!redisUrl) {
+//   throw new Error("REDIS_URL is missing from environment variables.");
+// }
+
+// const redis = new Redis(redisUrl, {
+//   maxRetriesPerRequest: null,
+// });
+
+// redis.on("connect", () => console.log("✅ Redis connected successfully!"));
+// redis.on("error", (err) => console.error("❌ Redis connection error:", err));
+
+// export { redis };
+
 import { Redis } from "ioredis";
 import dotenv from "dotenv";
 
@@ -67,11 +87,12 @@ dotenv.config();
 const redisUrl = process.env.REDIS_URL;
 
 if (!redisUrl) {
-  throw new Error("REDIS_URL is missing from environment variables.");
+  throw new Error("❌ REDIS_URL is missing from environment variables.");
 }
 
 const redis = new Redis(redisUrl, {
-  maxRetriesPerRequest: null, // ✅ Must be null for BullMQ
+  retryStrategy: (times) => Math.min(times * 50, 2000), // Exponential backoff
+  maxRetriesPerRequest: 5, // Limit retries to prevent endless loops
 });
 
 redis.on("connect", () => console.log("✅ Redis connected successfully!"));

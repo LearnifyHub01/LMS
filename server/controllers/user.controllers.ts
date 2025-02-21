@@ -17,8 +17,7 @@ import {
 import cloudinary from "cloudinary";
 import { Session } from "inspector/promises";
 import { io } from "../server";
-import { sessionQueue } from "../queue/sessionQueue";
-import clearSessionDataIfNoActiveUsers from "../queue/clearSessionDataIfNoActiveUsers";
+
 import {
   getAllUsersService,
   updateUserRoleService,
@@ -280,22 +279,14 @@ export const logoutUser = CatchAsyncError(
       user.sessions = user.sessions.filter(
         (session: any) => session.refreshToken !== refreshToken
       );
-      const jobs = await sessionQueue.getJobs(["delayed", "waiting"]);
 
-      for (const job of jobs) {
-        if (job.data.sessionKey === sessionKey) {
-          await job.remove(); // ✅ Remove job from queue
-          console.log(job);
-          console.log(`🗑 Removed job for session: ${sessionKey}`);
-        }
-      }
       await user.save();
       io.emit("updateDevices", user.sessions);
       res.status(200).json({
         success: true,
         message: "Logged out successfully",
       });
-      await clearSessionDataIfNoActiveUsers();
+
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -374,7 +365,7 @@ export const logoutFromAllDevice = CatchAsyncError(
         success: true,
         message: "Logged out from all devices",
       });
-      await clearSessionDataIfNoActiveUsers();
+
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }

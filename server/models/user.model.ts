@@ -92,7 +92,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
   },
   { timestamps: true }
 );
-userSchema.index({ "sessions.loginTime": 1 }, { expireAfterSeconds: 604800 });
+
 
 
 

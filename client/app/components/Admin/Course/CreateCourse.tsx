@@ -20,9 +20,9 @@ const CreateCourse = (props: Props) => {
     if (isSuccess) {
       toast.success("Course Created Successfully");
       setTimeout(() => {
-        router.push("/admin/all-courses");
-      }, 0);
-    }
+        router.push("/admin/live-courses");
+   }, 0);
+}
   
     if (error) {
       console.log("Error Object:", error); // 🔍 Debug the error structure

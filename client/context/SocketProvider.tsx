@@ -134,6 +134,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children, user }
     })
 
     socket.on('logoutSpecificDevice',async(data)=>{
+     
       toast.error('session expired',{
         duration:3000
       })

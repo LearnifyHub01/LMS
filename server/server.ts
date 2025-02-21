@@ -50,6 +50,8 @@ import connectDB from "./utils/ds";
 import { v2 as cloudinary } from "cloudinary";
 import http from "http";
 import { Server } from "socket.io";
+import './utils/sessionCleanup'
+
 
 require("dotenv").config();
 
@@ -85,7 +87,6 @@ io.on("connection", (socket) => {
 
   socket.on("logoutSpecificDevice", ({ sessionKey }) => {
     console.log(`📡 Logout Specific Device: ${sessionKey}`);
-    io.emit("logoutSpecificDevice", { sessionKey });
   })
 
   // Handle user disconnection
