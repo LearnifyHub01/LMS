@@ -1,46 +1,59 @@
 "use client";
 import Image from "next/image";
 import React, { FC } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaBook } from "react-icons/fa";
 import Image1 from "../../../public/assests/f993a37eb635feef43e96323100d5fa5.png";
-import { FaBook } from "react-icons/fa";
-import Marquee from "react-fast-marquee";
+import { motion } from "framer-motion";
+
 type Props = {};
+
+const ScrollingText: FC<{
+  text: string;
+  direction: "left" | "right";
+  top: number;
+}> = ({ text, direction, top }) => {
+  const fullText = `${text} ${text} ${text} ${text}`;
+  const variants = {
+    animate: {
+      x: direction === "left" ? ["0%", "-50%"] : ["-50%", "0%"],
+      transition: {
+        x: {
+          repeat: Infinity,
+          repeatType: "loop",
+          duration: 20,
+          ease: "linear",
+        },
+      },
+    },
+  };
+
+  return (
+    <div
+      className="absolute left-0 w-full z-0 overflow-hidden"
+      style={{ top: `${top}px` }}
+    >
+      <motion.div
+        variants={variants}
+        animate="animate"
+        initial={{ x: direction === "left" ? "0%" : "-50%" }}
+        className="inline-block whitespace-nowrap"
+      >
+        <span className="select-none whitespace-nowrap text-[15vmax] font-black uppercase leading-[0.75] text-slate-400 opacity-30">
+          {fullText}
+        </span>
+      </motion.div>
+    </div>
+  );
+};
 
 const Hero: FC<Props> = () => {
   return (
-    <>
     <div className="w-full h-screen flex flex-col lg:flex-row items-center justify-between bg-[#DDE6ED] dark:bg-[#27374D] relative overflow-hidden">
-      {/* Marquee Background Text */}
-      <div className="absolute top-0 left-0 w-full z-0">
-        <Marquee gradient={false} speed={50} direction="left" loop={0} className="marquee-no-scrollbar">
-          <span className="select-none whitespace-nowrap text-[15vmax] font-black uppercase leading-[0.75] text-slate-400 opacity-30">
-            grow daily&nbsp;grow daily&nbsp;grow daily&nbsp;grow daily&nbsp;
-          </span>
-        </Marquee>
-      </div>
-      <div className="absolute top-[170px] left-0 w-full z-0">
-        <Marquee gradient={false} speed={50} direction="right" loop={0} className="marquee-no-scrollbar">
-          <span className="select-none whitespace-nowrap text-[15vmax] font-black uppercase leading-[0.75] text-slate-400 opacity-30">
-             Stay Focused&nbsp;Stay Focused&nbsp;Stay Focused&nbsp;Stay Focused&nbsp;
-          </span>
-        </Marquee>
-      </div>
-      <div className="absolute top-[355px] left-0 w-full z-0">
-        <Marquee gradient={false} speed={50} direction="left" loop={0} className="marquee-no-scrollbar">
-          <span className="select-none whitespace-nowrap text-[15vmax] font-black uppercase leading-[0.75] text-slate-400 opacity-30">
-             Master Skills&nbsp;Master Skills&nbsp;Master Skills&nbsp;Master Skills&nbsp;
-          </span>
-        </Marquee>
-      </div>
-      <div className="absolute top-[530px] left-0 w-full z-0">
-        <Marquee gradient={false} speed={50} direction="right" loop={0} className="marquee-no-scrollbar">
-          <span className="select-none whitespace-nowrap text-[15vmax] font-black uppercase leading-[0.75] text-slate-400 opacity-30">
-             Unlock Potential&nbsp;Unlock Potential&nbsp;Unlock Potential&nbsp;Unlock Potential&nbsp;
-          </span>
-        </Marquee>
-      </div>
-   
+      {/* Scrolling Text Layers */}
+      <ScrollingText text="grow daily" direction="left" top={0} />
+      <ScrollingText text="Stay Focused" direction="right" top={170} />
+      <ScrollingText text="Master Skills" direction="left" top={355} />
+      <ScrollingText text="Unlock Potential" direction="right" top={530} />
 
       {/* Left Side - Image */}
       <div className="image-container z-10">
@@ -51,7 +64,7 @@ const Hero: FC<Props> = () => {
           layout="intrinsic"
           priority
         />
-      </div>  
+      </div>
 
       {/* Right Side - Text & Form */}
       <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start justify-center px-6 lg:px-12 text-center lg:text-left space-y-8 z-10">
@@ -106,7 +119,6 @@ const Hero: FC<Props> = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

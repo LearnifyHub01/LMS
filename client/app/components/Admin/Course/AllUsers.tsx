@@ -1,12 +1,13 @@
-'use client'
-import React, { useState,FC } from "react";
+"use client";
+import React, { useState, FC } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Box, Button, Container } from "@mui/material";
-import { FiTrash } from "react-icons/fi";
+import { Box, Container } from "@mui/material";
 import { useTheme } from "next-themes";
 import Loader from "../../Loader/Loader";
 import { useGetAllUsersQuery } from "@/redux/features/user/userApi";
 import { MdOutlineMarkEmailRead } from "react-icons/md";
+import { useSocket } from "@/context/SocketProvider"; // ✅ Import Socket Context
+import Header from "../Header";
 
 type Props = {
   isTeam: boolean;
@@ -15,6 +16,7 @@ type Props = {
 const AllUsers: FC<Props> = ({ isTeam }) => {
   const { theme } = useTheme();
   const { isLoading, data } = useGetAllUsersQuery({});
+  const { newUser } = useSocket(); // ✅ Get real-time new users
   const [active, setActive] = useState(false);
 
   const columns = [
@@ -31,7 +33,7 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
       flex: 0.25,
       sortable: false,
       disableColumnMenu: true,
-      renderCell: (params:any) => (
+      renderCell: (params: any) => (
         <a
           href={`mailto:${params.row.email}`}
           style={{
@@ -57,28 +59,31 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
     },
   ];
 
-  let rows: any = [];
+  // ✅ Combine API users and real-time users
+  let usersList = [...(data?.users || []), ...newUser];
 
-  if (data) {
-    rows = data.users
-      .filter((item: any) =>
-        isTeam ? item.role === "admin" : item.role !== "admin"
-      )
-      .map((item: any) => ({
-        id: item._id,
-        name: item.name,
-        email: item.email,
-        role: item.role,
-        courses: item.courses.length,
-        created_at: new Date(item.createdAt).toLocaleDateString(),
-      }));
-  }
+  let rows: any = usersList
+    .filter((item: any) => (isTeam ? item.role === "admin" : item.role !== "admin"))
+    .map((item: any) => ({
+      id: item._id,
+      name: item.name,
+      email: item.email,
+      role: item.role,
+      courses: item.courses.length,
+      created_at: new Date(item.createdAt).toLocaleDateString(),
+    }));
 
   return (
+    <div className="w-full  flex min-h-screen dark:bg-[#151632] ">
+  
+    {/* Main Content */}
+    <div className="w-[80%]">
+  
+    <Header title="All Users" subtitle="Welcome to dashboard"/>
+        
     <Container maxWidth="lg" sx={{ mt: 4, p: 3 }}>
       {isLoading ? (
         <Loader />
-        
       ) : (
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <h1 className="text-2xl font-bold text-[#003366] mb-4">
@@ -90,7 +95,7 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
                 className="mb-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-300 !w-[170px] flex items-center justify-center"
                 onClick={() => setActive(!active)}
               >
-                Add New Member 
+                Add New Member
               </button>
             </div>
           )}
@@ -135,6 +140,9 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
         </Box>
       )}
     </Container>
+    </div>
+    </div>
+
   );
 };
 

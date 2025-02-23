@@ -11,6 +11,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 type Props = {
   setRoute: (route: string) => void;
@@ -140,6 +141,14 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
             onClick={() => setRoute("Sign-Up")}
           >
             Sign up
+          </span>
+        </p>
+        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+          <span
+            className="text-[#2190ff] pl-1 cursor-pointer"
+            onClick={() => redirect("/forgotemail")}
+          >
+            forgot password
           </span>
         </p>
         <div className="flex items-center my-4">

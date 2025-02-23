@@ -70,6 +70,8 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
 export const authorizeRoles = (...roles:string[])=>{
     return(req:Request,res:Response,next:NextFunction)=>{
         if(!roles.includes(req.user?.role || '')){
+          console.log(req.user?.role)
+          console.log(req.user?.email)
             return next(new ErrorHandler(`Role:${req.user?.role} is not allowed to access this resources`,403))
         }
         next()

@@ -69,6 +69,7 @@ const io = new Server(server);
 export { io };
 
 // Handle Socket.io connections
+
 io.on("connection", (socket) => {
   console.log(`✅ A user connected: ${socket.id}`);
 
@@ -88,6 +89,7 @@ io.on("connection", (socket) => {
   socket.on("logoutSpecificDevice", ({ sessionKey }) => {
     console.log(`📡 Logout Specific Device: ${sessionKey}`);
   })
+
 
   // Handle user disconnection
   socket.on("disconnect", () => {

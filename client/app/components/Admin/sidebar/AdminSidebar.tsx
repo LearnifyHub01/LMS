@@ -325,7 +325,7 @@
 // export default AdminSidebar;
 "use client";
 import { JSX } from "react";
-import { useState, FC, useEffect } from "react";
+import { useState, FC, useEffect,useRef } from "react";
 import { Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import Link from "next/link";
 import { useSelector } from "react-redux";
@@ -359,9 +359,10 @@ interface ItemsProps {
   icon: JSX.Element;
   selected: string;
   setSelected: (title: string) => void;
+  closeSidebar: () => void;
 }
 
-const Item: FC<ItemsProps> = ({ title, to, icon, selected, setSelected }) => {
+const Item: FC<ItemsProps> = ({ title, to, icon, selected, setSelected,closeSidebar }) => {
   const { theme } = useTheme();
   const isDarkMode = theme === "dark";
   const iconColor = isDarkMode ? "white" : "black";
@@ -369,7 +370,10 @@ const Item: FC<ItemsProps> = ({ title, to, icon, selected, setSelected }) => {
   return (
     <MenuItem
       active={selected === title}
-      onClick={() => setSelected(title)}
+      onClick={() => {
+        setSelected(title);
+       closeSidebar()
+      }}
       className={` pl-5 ${
         isDarkMode
           ? "hover:bg-white/20 !text-white"
@@ -381,6 +385,7 @@ const Item: FC<ItemsProps> = ({ title, to, icon, selected, setSelected }) => {
       }}
       icon={<span style={{ color: iconColor }}>{icon}</span>} // Icon color change
       component={<Link href={to} />}
+     
     >
       <Typography
         className="!text-sm !font-Poppins"
@@ -399,12 +404,14 @@ const AdminSidebar = () => {
   const [mounted, setMounted] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const { theme } = useTheme();
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const isDarkMode = theme === "dark";
+
 
   useEffect(() => {
     setMounted(true);
     const handleResize = () => {
-      setIsMobileView(window.innerWidth <= 900);
+      setIsMobileView(window.innerWidth <= 1200);
     };
     window.addEventListener("resize", handleResize);
     handleResize();
@@ -412,6 +419,20 @@ const AdminSidebar = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+
+useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+      setIsCollapsed(true);
+    }
+  };
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
 
   if (!mounted) {
     return null;
@@ -432,6 +453,7 @@ const AdminSidebar = () => {
 
       {/* Sidebar */}
       <div
+      ref={sidebarRef}
         className={`fixed top-0 left-0 h-screen transition-all duration-300 ${
           isMobileView
             ? isCollapsed
@@ -445,15 +467,14 @@ const AdminSidebar = () => {
             <Box mb="25px">
               {/* Profile Section */}
               <Box display="flex" justifyContent="center" alignItems="center">
-              <div className="relative w-[100%] h-[100%]">
-            <Image
-              src={user?.avatar?.url || avtarIcon}
-              alt="Profile"
-              width={140}
-              height={140}
-              className="rounded-full border-2 border-gray-300"
-            />
-          </div>
+                <Image
+                 alt="profile-user"
+                 width={100}
+                 height={100}
+                 src={user.avatar?.url|| avtarIcon}
+                 style={{ width: "105px", height: "100px" }}
+                 className="mt-5 rounded-full"
+                />
               </Box>
 
               <Box textAlign="center">
@@ -465,7 +486,6 @@ const AdminSidebar = () => {
                 >
                   {user?.name}
                   {/* Add MdVerified icon next to the name */}
-
                   <MdVerified
                     style={{
                       marginLeft: "180px",
@@ -485,6 +505,7 @@ const AdminSidebar = () => {
                   icon={<FaThLarge />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Typography
                   sx={{ m: "15px 0 5px 20px" }}
@@ -502,6 +523,7 @@ const AdminSidebar = () => {
                   icon={<FaUser />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Item
                   title="Invoices"
@@ -509,6 +531,7 @@ const AdminSidebar = () => {
                   icon={<FaFileAlt />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Typography
                   sx={{ m: "15px 0 5px 20px" }}
@@ -526,6 +549,7 @@ const AdminSidebar = () => {
                   icon={<VideoLibraryIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Item
                   title="Live Courses"
@@ -533,6 +557,7 @@ const AdminSidebar = () => {
                   icon={<LiveTvIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Typography
                   sx={{ m: "15px 0 5px 20px" }}
@@ -550,6 +575,7 @@ const AdminSidebar = () => {
                   icon={<WebAssetIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Item
                   title="FAQ"
@@ -557,6 +583,7 @@ const AdminSidebar = () => {
                   icon={<QuizIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Item
                   title="Categories"
@@ -564,6 +591,7 @@ const AdminSidebar = () => {
                   icon={<CategoryIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Typography
                   sx={{ m: "15px 0 5px 20px" }}
@@ -581,6 +609,7 @@ const AdminSidebar = () => {
                   icon={<FaUsers />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Typography
                   sx={{ m: "15px 0 5px 20px" }}
@@ -589,6 +618,7 @@ const AdminSidebar = () => {
                     fontSize: "15px",
                     marginLeft: "35px",
                   }}
+
                 >
                   Analytics
                 </Typography>
@@ -598,6 +628,7 @@ const AdminSidebar = () => {
                   icon={<FaChartBar />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Item
                   title="Courses Analytics 2"
@@ -605,6 +636,7 @@ const AdminSidebar = () => {
                   icon={<FaChartBar />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Item
                   title="User Analytics"
@@ -612,6 +644,7 @@ const AdminSidebar = () => {
                   icon={<FaChartBar />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Typography
                   sx={{ m: "15px 0 5px 20px" }}
@@ -629,6 +662,7 @@ const AdminSidebar = () => {
                   icon={<FaCog />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
                 <Item
                   title="Logout"
@@ -636,6 +670,7 @@ const AdminSidebar = () => {
                   icon={<FaSignOutAlt />}
                   selected={selected}
                   setSelected={setSelected}
+                  closeSidebar={() => setIsCollapsed(true)}
                 />
               </Box>
             </Box>

@@ -31,7 +31,7 @@ const CourseOption: FC<Props> = ({ active, setActive }) => {
           </p>
         ))}
       </div>
-      <div className="relative w-full bg-gray-300 h-3 rounded-lg overflow-hidden">
+      <div className=" w-full bg-gray-300 h-3 rounded-lg overflow-hidden">
         <div
           className="h-full bg-blue-600 transition-all duration-300"
           style={{ width: `${progress}%` }}

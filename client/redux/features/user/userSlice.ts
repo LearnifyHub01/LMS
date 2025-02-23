@@ -38,9 +38,16 @@ const userSlice = createSlice({
           state.user.avatar.url = action.payload
         }
       }
+    },
+    setUpdateRole:(state,action:PayloadAction<string>)=>{
+      if(state.user){
+        if(state.user.role){
+          state.user.role = action.payload
+        }
+      }
     }
   },
 });
 
-export const { setUser, updateUserName , setUpdateImage} = userSlice.actions;
+export const { setUser, updateUserName , setUpdateImage,setUpdateRole} = userSlice.actions;
 export default userSlice.reducer;

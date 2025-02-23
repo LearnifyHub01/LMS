@@ -11,7 +11,6 @@ type Props = {};
 const Page = (props: Props) => {
   return (
     <div className=" dark:bg-[#151632]">
-    <Header title="Create Course" subtitle="Welcome to dashboard"/>
       <AdminProtected>
         <Heading
           title="Admin"

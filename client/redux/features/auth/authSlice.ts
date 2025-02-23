@@ -5,10 +5,12 @@ const initialState: {
     token: string;
     user: string;
     sessions: Session[]; 
+    role:string
   } = {
     token: "",
     user: "",
     sessions: [],
+    role:''
   };
 
 const authSlice = createSlice({
@@ -28,7 +30,8 @@ const authSlice = createSlice({
         },
         userSessions : (state,action)=>{
             state.sessions = action.payload
-        }
+        },
+        
     }
 })
 

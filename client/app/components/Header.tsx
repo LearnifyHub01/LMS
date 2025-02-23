@@ -223,7 +223,7 @@ import CustomModel from "../utils/CustomModel";
 import Login from "./Auth/Login";
 import SignUp from "./Auth/SignUp";
 import Verification from "./Auth/Verification";
-import TeachModal from "../utils/TechModel"; // Import the new modal
+import TeachModal from "../utils/TechModel";
 import { useSelector } from "react-redux";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { useSession } from "next-auth/react";
@@ -310,12 +310,15 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               >
                 LearnifyHub
               </Link>
-              <button
-                onClick={() => setTeachModalOpen(true)}
-                className="ml-4 hidden 800px:block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                Teach With Us
-              </button>
+              {user ? (
+                <button
+                  onClick={() => setTeachModalOpen(true)}
+                  className="ml-4 hidden 800px:block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Teach With Us
+                </button>
+              ) : 
+             null}
             </div>
             <div className="flex items-center justify-center gap-0 mr-10">
               <NavItems
@@ -342,7 +345,9 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                     height={4000}
                     width={3000}
                     className="w-[30px] h-[30px] rounded-full ml-5 hidden 800px:block cursor-pointer object-cover"
-                    style={{ border: activeItem === 5 ? "2px solid #37a39a" : "none" }}
+                    style={{
+                      border: activeItem === 5 ? "2px solid #37a39a" : "none",
+                    }}
                   />
                 </Link>
               ) : (

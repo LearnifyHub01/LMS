@@ -3,31 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0,0,0;
-  --background-start-rgb: 214,219,220;
-  --background-end-rgb: 255,255,255;
-  
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
 }
-
-
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255,255,255;
-    --background-start-rgb: 0,0,0;
-    --background-end-rgb: 0,0,0;
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
   }
 }
 
 input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button
-{
+input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type="number"]
-{
+input[type="number"] {
   -moz-appearance: textfield;
 }
 
@@ -61,42 +56,88 @@ body {
   align-items: center;
 }
 
-/* Style for the image */
 .hero-image {
-  object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
+  object-fit: cover; 
   width: 100%;
   height: 100%;
-  filter: brightness(0.9); /* Slightly darkens the image for better visibility */
-  transition: filter 0.3s ease; /* Smooth transition effect when switching modes */
+  filter: brightness(
+    0.9
+  ); 
+  transition: filter 0.3s ease; 
 }
 
-/* Dark mode styles */
 body.dark-mode .hero-image {
-  filter: brightness(0.7); /* Darken the image more in dark mode */
+  filter: brightness(0.7);
 }
 
-
-html, body {
+html,
+body {
   height: 100%;
   overflow: auto;
 }
 
+.marquee-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.marquee-container {
+  overflow: hidden; 
+  pointer-events: none; 
+}
+
+.marquee-no-scrollbar {
+  pointer-events: auto;
+}
+
+
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 8px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
-  background: #e0e0e0;
+  background: #f1f1f1;
+  border-radius: 10px;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background-color: #888;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background-color: #555;
+}
+
+.root {
+  position: relative;
+  margin-top: 5px;
+}
+
+.input {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom-width: 2px;
+  border-radius: 0;
+  padding-left: 0;
+  background-color: var(--mantine-color-body);
+}
+
+.label {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  top: 7px;
+  color: var(--mantine-color-placeholder);
+  font-weight: 400;
+  font-size: var(--mantine-font-size-sm);
+  transition: color 100ms ease, transform 100ms ease, font-size 100ms ease;
+
+  &[data-floating] {
+    transform: translateY(-20px);
+    font-size: var(--mantine-font-size-xs);
+    color: var(--mantine-color-text);
+  }
 }
 

@@ -195,7 +195,7 @@ const CourseInformation: FC<Props> = ({
           />
           <label
             htmlFor="file"
-            className={`w-full min-h-[10vh] dark:border:white border-[#00000026] p-3 border flex items-center justify-center border-white ${
+            className={`w-full min-h-[10vh] p-3 border flex items-center justify-center black:border-white black:border-white  ${
               dragging ? "bg-blue-500" : "bg-transparent"
             }`}
             onDragOver={handleDragOver}

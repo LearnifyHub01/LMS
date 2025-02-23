@@ -12,6 +12,7 @@ import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
 import { getAllUsersService } from "../services/user.service";
 import axios from "axios";
+import { io } from "../server";
 
 //upload course
 export const uploadCourse = CatchAsyncError(
@@ -19,7 +20,6 @@ export const uploadCourse = CatchAsyncError(
     try {
       const data = req.body;
       const thumbnail = data.thumbnail;
-      console.log('data is',data)
 
       if (thumbnail) {
         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
@@ -31,9 +31,9 @@ export const uploadCourse = CatchAsyncError(
           url: myCloud.url,
         };
       }
-      createCourse(data, res, next); // from services
+      createCourse(data, res, next);
     } catch (error: any) {
-      console.log(error)
+      console.log(error);
       return next(new ErrorHandler(error.message, 500));
     }
   }
@@ -92,7 +92,7 @@ export const getSingleCourse = CatchAsyncError(
           "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
         );
         //course not use that much it will automatically deleted
-        await redis.set(courseId, JSON.stringify(course),'EX',604800);
+        await redis.set(courseId, JSON.stringify(course), "EX", 604800);
         res.status(200).json({
           succcess: true,
           course,
@@ -402,7 +402,6 @@ export const addReplyToReview = CatchAsyncError(
   }
 );
 
-
 //get all courses   --- only admin
 export const getAllCoursesForAdmin = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -415,47 +414,77 @@ export const getAllCoursesForAdmin = CatchAsyncError(
 );
 
 
-//Delete course - only for admin
-export const deleteCourse = CatchAsyncError(
+// export const deleteCourse = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const { id } = req.params;
+//       const course = await CourseModel.findById(id);
+//       if (!course) {
+//         return next(new ErrorHandler("course  not exists", 400));
+//       }
+//       await course.deleteOne({ id });
+//       await redis.del(id);
+//       res.status(200).json({
+//         success: true,
+//         message: "Course Deleted Successfully",
+//       });
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, 400));
+//     }
+//   }
+// );
+
+export const generateVideoUrl = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
-      const course = await CourseModel.findById(id);
-      if (!course) {
-        return next(new ErrorHandler("course  not exists", 400));
-      }
-      await course.deleteOne({ id });
-      await redis.del(id);
-      res.status(200).json({
-        success: true,
-        message: "Course Deleted Successfully",
-      });
+      const { videoId } = req.body;
+      const response = await axios.post(
+        `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
+        { ttl: 3600 },
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Apisecret ${process.env.VDOCIPHER_API_SECRET}`,
+          },
+        }
+      );
+      res.json(response.data);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
 
-
-//generate video url
-export const generateVideoUrl = CatchAsyncError(
+export const deleteCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {videoId} = req.body
-      const response = await axios.post(
-        `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
-        {ttl: 3600},
-        {
-          headers:{
-            Accept:'application/json',
-            'Content-Type':'application/json',
-            Authorization:`Apisecret ${process.env.VDOCIPHER_API_SECRET}`
-          }
-        }
-      )
-      res.json(response.data )
-    } catch (error:any) {
-      return next(new ErrorHandler(error.message, 400));
-    }
+      const courseId = req.params.id;
 
-  })
+      // Validate ObjectId format
+      if (!mongoose.Types.ObjectId.isValid(courseId)) {
+        return next(new ErrorHandler("Invalid course ID format", 400));
+      }
+
+      const course = await CourseModel.findById(courseId);
+      if (!course) {
+        return next(new ErrorHandler("Course does not exist", 404));
+      }
+
+      await CourseModel.findByIdAndDelete(courseId);
+
+      // Clear cache if you're using redis for this course
+      await redis.del(courseId);
+
+      res.status(200).json({
+        success: true,
+        message: "Course deleted successfully",
+      });
+    } catch (error: any) {
+      console.error("Delete course error:", error);
+      return next(
+        new ErrorHandler(error.message || "Failed to delete course", 500)
+      );
+    }
+  }
+);

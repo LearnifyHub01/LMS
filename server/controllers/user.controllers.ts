@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import userModel, { IUser, ISession } from "../models/user.model";
 import ErrorHandler from "../utils/ErrorHandler";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
-import jwt, { Secret, JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 require("dotenv").config();
 import ejs from "ejs";
 import path from "path";
@@ -22,7 +22,7 @@ import {
   getAllUsersService,
   updateUserRoleService,
 } from "../services/user.service";
-
+import bcrypt from "bcryptjs";
 const uaParser = require("ua-parser-js");
 
 //register user
@@ -54,7 +54,7 @@ export const registrationUser = CatchAsyncError(
 
       // Generate activation token
       const activationToken = createActivationToken(user);
-      const activationCode = activationToken.activationCode;  
+      const activationCode = activationToken.activationCode;
 
       const data = { user: { name: user.name }, activationCode };
 
@@ -155,6 +155,7 @@ export const activateUser = CatchAsyncError(
         email,
         password,
       });
+      io.emit("new-user", user);
 
       res.status(201).json({
         success: true,
@@ -286,7 +287,6 @@ export const logoutUser = CatchAsyncError(
         success: true,
         message: "Logged out successfully",
       });
-
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -365,7 +365,6 @@ export const logoutFromAllDevice = CatchAsyncError(
         success: true,
         message: "Logged out from all devices",
       });
-
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -473,11 +472,13 @@ export const updateAccessToken = CatchAsyncError(
         return next(new ErrorHandler("Invalid or expired refresh token", 400));
       }
 
-        const userId = decoded.id;
+      const userId = decoded.id;
       const user = await userModel.findById(userId);
 
       if (!user) {
-        return next(new ErrorHandler('please login for access this resource', 400));
+        return next(
+          new ErrorHandler("please login for access this resource", 400)
+        );
       }
 
       const sessionKey = `session:${userId}:${sessionId}`;
@@ -508,7 +509,6 @@ export const updateAccessToken = CatchAsyncError(
 
       res.cookie("access_token", accessToken, accessTokenOptions);
       res.cookie("refresh_token", newRefreshToken, refreshTokenOptions);
-  
 
       // 4️⃣ Update refresh token in MongoDB for the correct session
 
@@ -805,7 +805,34 @@ export const updateUserRole = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id, role } = req.body;
-      updateUserRoleService(res, id, role);
+      const userId = req.user?._id;
+
+      // Update role in the database
+      await updateUserRoleService(res, id, role);
+
+      // Fetch the updated user from the database
+      const updatedUser = await userModel.findById(userId);
+
+      // Get all session keys for this user
+      const sessionKeys = await redis.keys(`session:${userId}:*`);
+
+      for (const key of sessionKeys) {
+        const existingSession = await redis.get(key);
+        if (existingSession) {
+          const sessionData = JSON.parse(existingSession);
+
+          // Update session with new role
+          sessionData.sessionUser.role = updatedUser?.role;
+
+          // Save updated session back to Redis
+          await redis.set(
+            key,
+            JSON.stringify(sessionData),
+            "EX",
+            7 * 24 * 60 * 60
+          );
+        }
+      }
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -828,9 +855,146 @@ export const deleteUser = CatchAsyncError(
         message: "User Deleted Successfully",
       });
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+interface IForgotToken {
+  token: string;
+}
+export const createForgotPasswordToken = (
+  user: IRegistrationBody
+): IForgotToken => {
+  // Validate user fields
+  if (!user) {
+    throw new Error("Missing required user information for activation token.");
+  }
+  const token = jwt.sign(
+    {
+      user,
+    },
+    process.env.ACTIVATION_SECRET as Secret,
+    { expiresIn: "15m" }
+  );
+
+  return { token };
+};
+
+export const forgotPassword = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email } = req.body;
+      console.log(email);
+      const user = await userModel.findOne({ email: email });
+      if (!user) {
+        return next(new ErrorHandler("User not exists", 400));
+      }
+      const token = createForgotPasswordToken(email);
+      console.log(token.token);
+      res.status(200).json({
+        status: true,
+        token: token.token,
+      });
+      const data = {
+        user: { name: user.name },
+        text: `http://localhost:3000/auth/forgot-password/${user._id}/${token.token}`,
+      };
+      await sendMail({
+        email: user.email,
+        subject: "Forgot Your Password",
+        templet: "forgot-password-mail.ejs",
+        data,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+// export const resetPassword = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const { id, token } = req.params;
+//     const { password } = req.body;
+//     const decoded = jwt.verify(
+//       token,
+//       process.env.ACTIVATION_SECRET as Secret
+//     ) as JwtPayload;
+//     if (!decoded) {
+//       return next(new ErrorHandler("token is expire", 400));
+//     }
+//     const hash = await bcrypt.hash(password, 10);
+//     const dbUser = await userModel.findOneAndUpdate(
+//       { email: decoded.user },
+//       { $set: { password: hash } },
+//       { new: true, runValidators: true }
+//     );
+//     io.emit('passwordChange',{userId:id})
+//     res.status(200).json({
+//       success: true,
+//       hash,
+//     });
+//   }
+// );
+export const resetPassword = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { token } = req.params;
+      const { password } = req.body;
+
+      // ✅ Decode the reset token to extract user email
+      const decoded = jwt.verify(token, process.env.ACTIVATION_SECRET as Secret) as JwtPayload;
+      if (!decoded || !decoded.user) {
+        return next(new ErrorHandler("Invalid or expired token", 400));
+      }
+
+      // ✅ Find the user by email
+      const user = await userModel.findOne({ email: decoded.user });
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+
+      // ✅ Hash the new password
+      user.password = await bcrypt.hash(password, 10);
+      await user.save();
+
+      // ✅ Logout user from all devices after password change
+      await logoutFromAllOnPasswordChange(user._id.toString());
+
+      // ✅ Emit WebSocket event to notify other sessions
+      io.emit("logoutAllDevices", { userId: user._id.toString() });
+
+      res.status(200).json({
+        success: true,
+        message: "Password changed successfully. Logged out from all devices.",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
     }
   }
 );
 
 
+export const logoutFromAllOnPasswordChange = async (userId: string) => {
+  try {
+    // ✅ Find the user
+    const user = await userModel.findById(userId);
+    if (!user) throw new Error("User not found");
+
+    // ✅ Clear all Redis sessions
+    const keys = await redis.keys(`session:${userId}:*`);
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+
+    // ✅ Remove stored sessions from database
+    user.sessions = [];
+    await user.save();
+
+    // ✅ Emit event to logout all active sessions
+    io.emit("logoutAllDevices", { userId });
+
+    console.log(`🔒 User ${userId} logged out from all devices`);
+  } catch (error: any) {
+    console.error("Logout error:", error.message);
+  }
+};

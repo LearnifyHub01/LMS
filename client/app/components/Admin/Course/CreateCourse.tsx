@@ -117,6 +117,7 @@ const CreateCourse = (props: Props) => {
   
   return (
     <div className="w-full flex min-h-screen dark:bg-[#151632]">
+  
       {/* Main Content */}
       <div className="w-[80%]">
       <Header title="Create Course" subtitle="Welcome to dashboard"/>
