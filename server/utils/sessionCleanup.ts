@@ -7,7 +7,7 @@ const SESSION_EXPIRATION_MS =  7 * 24 * 60 * 60 * 1000;
 
 // Run the cron job every minute
 cron.schedule("* * * * *", async () => {
-  console.log("🔄 Running session cleanup cron job...");
+ // console.log("🔄 Running session cleanup cron job...");
 
   const now = Date.now(); // Get current timestamp in milliseconds
 
@@ -21,7 +21,7 @@ cron.schedule("* * * * *", async () => {
     });
 
     if (expiredSessions.length > 0) {
-      console.log(`🚨 Expired sessions found for user: ${user._id}`);
+     // console.log(`🚨 Expired sessions found for user: ${user._id}`);
 
       // Remove expired sessions from DB using `$pull`
       await UserModel.updateOne(
@@ -32,10 +32,10 @@ cron.schedule("* * * * *", async () => {
       // Emit logout event for each expired session
       expiredSessions.forEach((session) => {
         io.emit("logoutSpecificDevice", { sessionKey: session.sessionKey });
-        console.log(`📡 Auto-logout emitted for session: ${session.sessionKey}`);
+       // console.log(`📡 Auto-logout emitted for session: ${session.sessionKey}`);
       });
     }
   }
 
-  console.log("✅ Session cleanup completed.");
+  //console.log("✅ Session cleanup completed.");
 });

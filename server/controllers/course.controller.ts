@@ -2,7 +2,7 @@ import ErrorHandler from "../utils/ErrorHandler";
 import { Request, Response, NextFunction } from "express";
 import { CatchAsyncError } from "./../middleware/catchAsyncErrors";
 import cloudinary from "cloudinary";
-import { createCourse, getAllCoursesService } from "../services/course.service";
+import { createCourse, getAllCoursesService, getVideoLength } from "../services/course.service";
 import CourseModel from "../models/course.model";
 import { redis } from "../utils/redis";
 import mongoose from "mongoose";
@@ -33,33 +33,49 @@ export const uploadCourse = CatchAsyncError(
       }
       createCourse(data, res, next);
     } catch (error: any) {
-      console.log(error);
       return next(new ErrorHandler(error.message, 500));
     }
   }
 );
 
-//edit course
-
+interface VideoData {
+  videoUrl: string;
+  videoLength: number;
+  [key: string]: any;
+}
 export const editCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
       const thumbnail = data.thumbnail;
-
-      if (thumbnail) {
-        await cloudinary.v2.uploader.destroy(thumbnail.public_id);
-
+      const courseId = req.params.id;
+      const courseData = (await CourseModel.findById(courseId)) as any;
+      console.log(courseData.thumbnail)
+      if (thumbnail && !thumbnail.startsWith("http")) {
+        await cloudinary.v2.uploader.destroy(courseData.thumbnail);
         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
           folder: "courses",
         });
-
         data.thumbnail = {
           public_id: myCloud.public_id,
           url: myCloud.secure_url,
         };
       }
-      const courseId = req.params.id;
+
+      if (thumbnail.startsWith("https")) {
+        data.thumbnail = {
+          public_id: courseData?.thumbnail.public_id,
+          url: courseData?.thumbnail.url,
+        };
+      }
+      const updatedCourseData = await Promise.all(
+        data.courseData.map(async (video: VideoData) => {
+          const videoId = video.videoUrl;
+          const length = await getVideoLength(videoId);
+          return { ...video, videoLength: length };
+        })
+      );
+      data.courseData = updatedCourseData;
       const course = await CourseModel.findByIdAndUpdate(
         courseId,
         {
@@ -67,12 +83,21 @@ export const editCourse = CatchAsyncError(
         },
         { new: true }
       );
-
-      res.status(200).json({
+      const rediseCourse = await CourseModel.find().select(
+        "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
+      );
+      const updateCourse = await CourseModel.findById(courseId).select(
+        "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
+      );
+      await redis.set("allCourses", JSON.stringify(rediseCourse));
+      await redis.del(courseId);
+      await redis.set(courseId, JSON.stringify(updateCourse), "EX", 604800);
+      res.status(201).json({
         success: true,
         course,
       });
     } catch (error: any) {
+      console.log(error)
       return next(new ErrorHandler(error.message, 500));
     }
   }
@@ -87,6 +112,10 @@ export const getSingleCourse = CatchAsyncError(
       const isCacheExist = await redis.get(courseId);
       if (isCacheExist) {
         const course = JSON.parse(isCacheExist);
+        res.status(200).json({
+          succcess: true,
+          course,
+        });
       } else {
         const course = await CourseModel.findById(req.params.id).select(
           "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
@@ -104,7 +133,7 @@ export const getSingleCourse = CatchAsyncError(
   }
 );
 
-//get all course - withour purchasing
+//get all course - without purchasing
 
 export const getAllCourses = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -120,7 +149,6 @@ export const getAllCourses = CatchAsyncError(
         const courses = await CourseModel.find().select(
           "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
         );
-        await redis.set("allCourses", JSON.stringify(courses));
         res.status(200).json({
           success: true,
           courses,
@@ -413,7 +441,6 @@ export const getAllCoursesForAdmin = CatchAsyncError(
   }
 );
 
-
 // export const deleteCourse = CatchAsyncError(
 //   async (req: Request, res: Response, next: NextFunction) => {
 //     try {
@@ -438,6 +465,7 @@ export const generateVideoUrl = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { videoId } = req.body;
+     
       const response = await axios.post(
         `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
         { ttl: 3600 },
@@ -445,10 +473,14 @@ export const generateVideoUrl = CatchAsyncError(
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
-            Authorization: `Apisecret ${process.env.VDOCIPHER_API_SECRET}`,
+            Authorization: `Apisecret dC5iMpNu7SqoXMaEgSRy62bNhctYnkFJSZVMlHO5tRPVUdYmsL1syKSUJJOJsEow`,
           },
         }
       );
+      const videoData = response.data
+      const length =  videoData.length;
+      
+
       res.json(response.data);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -456,12 +488,12 @@ export const generateVideoUrl = CatchAsyncError(
   }
 );
 
+//delete course
 export const deleteCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const courseId = req.params.id;
 
-      // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(courseId)) {
         return next(new ErrorHandler("Invalid course ID format", 400));
       }
@@ -472,8 +504,10 @@ export const deleteCourse = CatchAsyncError(
       }
 
       await CourseModel.findByIdAndDelete(courseId);
-
-      // Clear cache if you're using redis for this course
+      const rediseCourse = await CourseModel.find().select(
+        "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
+      );
+      await redis.set("allCourses", JSON.stringify(rediseCourse));
       await redis.del(courseId);
 
       res.status(200).json({

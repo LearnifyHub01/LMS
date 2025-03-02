@@ -4,7 +4,7 @@ import { authorizeRoles, isAuthenticated } from '../middleware/auth'
 const courseRouter = express.Router()
 
 
-courseRouter.post('/create-course',isAuthenticated,authorizeRoles("admin"),uploadCourse)
+courseRouter.post('/create-course',uploadCourse)
 courseRouter.put('/edit-course/:id',isAuthenticated,authorizeRoles("admin"),editCourse)
 courseRouter.get('/get-course/:id',getSingleCourse)
 courseRouter.get('/get-courses',getAllCourses)
@@ -16,8 +16,5 @@ courseRouter.put('/add-reply/:id',isAuthenticated,authorizeRoles("admin"),addRep
 courseRouter.get('/get-all-courses',isAuthenticated,authorizeRoles("admin"),getAllCoursesForAdmin)
 courseRouter.post('/getVdoCipherOTP',generateVideoUrl)
 courseRouter.delete('/delete-course/:id',isAuthenticated,authorizeRoles("admin"),deleteCourse)
-
-
-
 
 export default courseRouter

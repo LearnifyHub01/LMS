@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { AiFillHome } from "react-icons/ai";
-import { MdSchool } from "react-icons/md";
 import Image from "next/image";
-import { MdLiveHelp, MdGavel, MdLogout } from "react-icons/md";
-import { FaInfoCircle, FaUnlockAlt, FaChalkboardTeacher } from "react-icons/fa";
+import { MdLiveHelp, MdGavel } from "react-icons/md";
+import { FaInfoCircle} from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { MdGroupAdd } from "react-icons/md";
 import { useLogOutQuery } from "@/redux/features/auth/authApi";
@@ -12,7 +11,6 @@ import { redirect } from "next/navigation";
 import { signOut } from "next-auth/react";
 import avatar from "../../public/assests/download5.png";
 import { useSelector } from "react-redux";
-import { RiAdminFill } from "react-icons/ri";
 import { Dashboard,School,Lock,Memory} from  "@mui/icons-material"
 
 export const NavItemsData = [

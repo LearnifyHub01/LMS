@@ -71,29 +71,29 @@ export { io };
 // Handle Socket.io connections
 
 io.on("connection", (socket) => {
-  console.log(`✅ A user connected: ${socket.id}`);
+  // console.log(`✅ A user connected: ${socket.id}`);
 
   // ✅ Listen for user login and join room
   socket.on("userLoggedIn", (userId) => {
-    console.log(`🚪 Joining room: user-${userId}`);
+    //console.log(`🚪 Joining room: user-${userId}`);
     socket.join(`user-${userId}`);
     io.to(`user-${userId}`).emit("updateDevices", { userId });
   });
 
   // ✅ Handle logout from all devices
   socket.on("logoutFromAll", (userId) => {
-    console.log(`🚪 Logging out user: ${userId} from all devices`);
+    //console.log(`🚪 Logging out user: ${userId} from all devices`);
     io.emit("logoutAllDevices", { userId });
   });
 
   socket.on("logoutSpecificDevice", ({ sessionKey }) => {
-    console.log(`📡 Logout Specific Device: ${sessionKey}`);
+   // console.log(`📡 Logout Specific Device: ${sessionKey}`);
   })
 
 
   // Handle user disconnection
   socket.on("disconnect", () => {
-    console.log(`❌ A user disconnected: ${socket.id}`);
+    //console.log(`❌ A user disconnected: ${socket.id}`);
   });
 });
 

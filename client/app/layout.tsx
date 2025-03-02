@@ -115,7 +115,7 @@ export default function RootLayout({
 const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading } = useLoadUserQuery({});
   const user = useSelector((state: RootState) => state.auth.user);
-  console.log('user is',user)
+
   return isLoading ? (
     <Loader />
   ) : (

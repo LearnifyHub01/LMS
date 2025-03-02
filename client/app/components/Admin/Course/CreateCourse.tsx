@@ -25,7 +25,7 @@ const CreateCourse = (props: Props) => {
 }
   
     if (error) {
-      console.log("Error Object:", error); // 🔍 Debug the error structure
+      // console.log("Error Object:", error); 
       if ("data" in error) {
         const errorMessage = typeof error.data === "string" ? error.data : JSON.stringify(error.data);
         toast.error(errorMessage);
@@ -48,7 +48,7 @@ const CreateCourse = (props: Props) => {
   const [prerequisites, setPrerequisites] = useState([{ title: "" }]);
   const [courseContentData, setCourseContentData] = useState([
     {
-      vidoUrl: "",
+      videoUrl: "",
       title: "",
       description: "",
       videoSection: "Untitled section",
@@ -76,16 +76,18 @@ const CreateCourse = (props: Props) => {
     //formare course contetn array
     const formattedCourseContentData = courseContentData.map(
       (courseContent) => ({
-        videoUrl: courseContent.vidoUrl,
+        videoUrl: courseContent.videoUrl,
         title: courseContent.title,
         description: courseContent.description,
         videoSection: courseContent.videoSection,
+        videoLength:'0',
         links: courseContent.links.map((link) => ({
           title: link.title,
           url: link.url,
         })),
       })
     );
+    console.log('formatted',formattedCourseContentData)
 
     //prepate our data object
     const data = {
@@ -100,9 +102,8 @@ const CreateCourse = (props: Props) => {
       totalVideos: courseContentData.length,
       benefits: formattedBenifits,
       prerequisites: formattedPrerequisites,
-      courseContentData: formattedCourseContentData,
+      courseData: formattedCourseContentData,
     };
-
     setCourseData(data);
    
   return data
@@ -158,12 +159,11 @@ const CreateCourse = (props: Props) => {
             setActive={setActive}
             courseData={courseData}
             handleCourseCreate={handleCourseCreate}
+            isEdit={false}
             />
           )
         }
       </div>
-
-      {/* Fixed Course Option at the Right End */}
    
     </div>
   );

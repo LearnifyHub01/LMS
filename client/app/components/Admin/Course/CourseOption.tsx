@@ -14,7 +14,7 @@ const CourseOption: FC<Props> = ({ active, setActive }) => {
   ];
 
   // Calculate progress percentage
-  const progress = ((active + 1) / options.length) * 100;
+  const progress = ((active) / options.length) * 100;
 
   return (
     <div className=" top-0 z-50 p-4">
@@ -24,7 +24,7 @@ const CourseOption: FC<Props> = ({ active, setActive }) => {
           <p
             key={index}
             className={`text-sm font-semibold ${
-              active >= index ? "text-blue-600" : "text-gray-400"
+              active-1 >= index ? "text-blue-600" : "text-gray-400"
             }`}
           >
             {option}

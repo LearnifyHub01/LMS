@@ -62,8 +62,8 @@ const CoursePlayer: FC<Props> = ({ videoUrl, thumnail, title }) => {
   const [videoData, setVideoData] = useState({
     otp: "",
     playbackInfo: "",
-    videoWidth: 800, // Default width
-    videoHeight: 360, // Default height
+    videoWidth: 800, 
+    videoHeight: 360, 
   });
 
   useEffect(() => {
@@ -73,6 +73,7 @@ const CoursePlayer: FC<Props> = ({ videoUrl, thumnail, title }) => {
       })
       .then((res) => {
         const { otp, playbackInfo } = res.data;
+        console.log(otp,playbackInfo)
 
         let videoWidth = 800;
         let videoHeight = 360;
@@ -116,6 +117,7 @@ const CoursePlayer: FC<Props> = ({ videoUrl, thumnail, title }) => {
           height={360}
           className="rounded-lg shadow-lg"
         />
+        
       )}
     </div>
   );

@@ -23,6 +23,7 @@ import {
   updateUserRoleService,
 } from "../services/user.service";
 import bcrypt from "bcryptjs";
+import { log } from "console";
 const uaParser = require("ua-parser-js");
 
 //register user
@@ -865,7 +866,6 @@ interface IForgotToken {
 export const createForgotPasswordToken = (
   user: IRegistrationBody
 ): IForgotToken => {
-  // Validate user fields
   if (!user) {
     throw new Error("Missing required user information for activation token.");
   }
@@ -876,6 +876,7 @@ export const createForgotPasswordToken = (
     process.env.ACTIVATION_SECRET as Secret,
     { expiresIn: "15m" }
   );
+  console.log('token generated',token)
 
   return { token };
 };
@@ -899,6 +900,7 @@ export const forgotPassword = CatchAsyncError(
         user: { name: user.name },
         text: `http://localhost:3000/auth/forgot-password/${user._id}/${token.token}`,
       };
+      console.log(`email recived ${email}`)
       await sendMail({
         email: user.email,
         subject: "Forgot Your Password",
@@ -911,36 +913,13 @@ export const forgotPassword = CatchAsyncError(
   }
 );
 
-// export const resetPassword = CatchAsyncError(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const { id, token } = req.params;
-//     const { password } = req.body;
-//     const decoded = jwt.verify(
-//       token,
-//       process.env.ACTIVATION_SECRET as Secret
-//     ) as JwtPayload;
-//     if (!decoded) {
-//       return next(new ErrorHandler("token is expire", 400));
-//     }
-//     const hash = await bcrypt.hash(password, 10);
-//     const dbUser = await userModel.findOneAndUpdate(
-//       { email: decoded.user },
-//       { $set: { password: hash } },
-//       { new: true, runValidators: true }
-//     );
-//     io.emit('passwordChange',{userId:id})
-//     res.status(200).json({
-//       success: true,
-//       hash,
-//     });
-//   }
-// );
+
 export const resetPassword = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { token } = req.params;
       const { password } = req.body;
-
+      console.log('reset pasword call')
       // ✅ Decode the reset token to extract user email
       const decoded = jwt.verify(token, process.env.ACTIVATION_SECRET as Secret) as JwtPayload;
       if (!decoded || !decoded.user) {
@@ -952,10 +931,15 @@ export const resetPassword = CatchAsyncError(
       if (!user) {
         return next(new ErrorHandler("User not found", 404));
       }
-
+      console.log(user)
+      console.log('user password',user.password)
       // ✅ Hash the new password
-      user.password = await bcrypt.hash(password, 10);
-      await user.save();
+      console.log('new password',password)
+      const newPassword= await bcrypt.hash(password, 10);
+      await userModel.updateOne(
+        { _id: user._id },
+        { password: newPassword }
+      );
 
       // ✅ Logout user from all devices after password change
       await logoutFromAllOnPasswordChange(user._id.toString());
@@ -993,7 +977,7 @@ export const logoutFromAllOnPasswordChange = async (userId: string) => {
     // ✅ Emit event to logout all active sessions
     io.emit("logoutAllDevices", { userId });
 
-    console.log(`🔒 User ${userId} logged out from all devices`);
+    //console.log(`🔒 User ${userId} logged out from all devices`);
   } catch (error: any) {
     console.error("Logout error:", error.message);
   }

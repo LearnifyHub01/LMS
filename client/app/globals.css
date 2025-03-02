@@ -140,4 +140,49 @@ body {
     color: var(--mantine-color-text);
   }
 }
+/* 
+@keyframes slideDown {
+  from { opacity: 0; height: 0; padding-top: 0; padding-bottom: 0; }
+  to { opacity: 1; height: auto; padding-top: 1.25rem; padding-bottom: 1.25rem; }
+}
+.animate-slide-down {
+  animation: slideDown 0.4s ease-out;
+}  */
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+    max-height: 0;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 200px; 
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.4s ease-out forwards;
+}
+
+/* ---------------------------------------------- */
+
+@layer base {
+  body {
+    @apply bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white;
+  }
+}
+
+@layer components {
+  .course-card {
+    @apply w-full max-w-sm mx-auto; 
+  }
+}
+
+@media (max-width: 640px) {
+  .course-card {
+    margin: 0 1rem;
+  }
+} 
 
