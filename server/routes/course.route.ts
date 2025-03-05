@@ -1,6 +1,7 @@
 import express from 'express'
 import { editCourse, uploadCourse,getSingleCourse, getAllCourses, getCourseByUser, addQuestion, addAnswer, addReview, addReplyToReview, getAllCoursesForAdmin, deleteCourse, generateVideoUrl } from '../controllers/course.controller'
 import { authorizeRoles, isAuthenticated } from '../middleware/auth'
+import { updateAccessToken } from '../controllers/user.controllers'
 const courseRouter = express.Router()
 
 

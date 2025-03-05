@@ -10,6 +10,7 @@ export const newOrder = CatchAsyncError(
         res.status(201).json({  // ✅ Fixed: `res.send(201).json(...)` -> `res.status(201).json(...)`
             success: true,
             order,
+            message:'course purchased'
         });
     }
 );

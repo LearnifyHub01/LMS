@@ -11,15 +11,35 @@ import userModel from "../models/user.model";
 import OrderModel, { IOrder } from "../models/order.model";
 import { getAllOrdersService, newOrder } from "../services/order.service";
 import { ICourse } from "../models/course.model";
+import { tryCatch } from "bullmq";
+import Razorpay from "razorpay";
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,       
+  key_secret: process.env.RAZORPAY_KEY_SECRET  
+});
 
 //create order
 export const createOrder = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { courseId, paymentInfo } = req.body as IOrder;
-
+      const { courseId, payment_Info } = req.body as IOrder;
+      if (payment_Info) {
+        if ("id" in payment_Info) {
+          const paymentId = payment_Info.id as any;
+          try {
+            const paymentDetails = await razorpay.payments.fetch(paymentId);
+      
+            if (paymentDetails.status !== "captured") {
+              return next(new ErrorHandler("payment not authorized",400))
+            }
+          } catch (error) {
+            console.error("Error fetching payment details:", error);
+          }
+        }
+      }
       const user = await userModel.findById(req?.user?._id);
-
+      console.log(user)
       const courseExistInUser = user?.courses?.some(
         (item: any) => item._id.toString() === courseId
       );
@@ -28,7 +48,6 @@ export const createOrder = CatchAsyncError(
           new ErrorHandler("You have already purchased this course", 400)
         );
       }
-
       const course = await CourseModel.findById(courseId);
       console.log(course?.purchased);
       if (!course) {
@@ -38,7 +57,7 @@ export const createOrder = CatchAsyncError(
       const data: any = {
         courseId: course._id,
         userId: user?._id,
-        paymentInfo,
+        payment_Info,
       };
 
       const mailData = {
@@ -72,6 +91,8 @@ export const createOrder = CatchAsyncError(
       }
 
       user?.courses?.push(course?.id);
+      //update redis updation for user is pendig
+
 
       await user?.save();
       //notification for admin
@@ -109,5 +130,33 @@ export const getAllOrders = CatchAsyncError(
     }
   );
 
-  
-  
+
+
+
+
+export const newPayment = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const {amount} = req.body
+      if (!amount || isNaN(amount)) {
+        return res.status(400).json({
+            success: false,
+            error: 'Amount is required and must be a number'
+        });
+    }
+    const options = {
+      amount:amount*100,
+      currency:'INR',
+      payment_capture: 1
+    }
+    
+    const order = await razorpay.orders.create(options)
+    res.status(200).json({
+      success:true,
+      order_id: order.id,
+      status: order.status
+    })
+    } catch (error:any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })

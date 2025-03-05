@@ -39,7 +39,7 @@ import { redis } from "../utils/redis";
 export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { access_token } = req.cookies;
-    const sessionId = req.cookies.session_id; // Get session_id from cookie
+    const sessionId = req.cookies.session_id; // Get session_id from cookie 
 
     if (!access_token || !sessionId) {
       return next(new ErrorHandler("User not authenticated", 401));
@@ -59,9 +59,9 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
       return next(new ErrorHandler("Session expired or invalid", 401));
     }
     
-    req.user = JSON.parse(sessionData).sessionUser; // Attach user info to request
+    req.user = JSON.parse(sessionData).sessionUser; 
     
-    next();
+    next(); 
   } catch (error) {
     return next(new ErrorHandler("Invalid or expired token", 401));
   }

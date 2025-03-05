@@ -3,14 +3,36 @@ import Ratings from "@/app/utils/Ratings";
 import { Rating } from "@mui/material";
 import Link from "next/link";
 import React, { useState } from "react";
-import { IoCheckmarkDone } from "react-icons/io5";
+import {
+  IoCheckmarkDone,
+  IoCloseCircle,
+  IoCloseOutline,
+} from "react-icons/io5";
 import { useSelector } from "react-redux";
 import CourseContentList from "./CourseContentList";
 import imagethumbnail from "../../../public/assests/charlesdeluvio-Lks7vei-eAg-unsplash.jpg";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 type Props = {
   data: any;
 };
+
+const loadRazorpayScript = async () => {
+  return new Promise((resolve) => {
+    if (document.getElementById("razorpay-script")) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.id = "razorpay-script";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 
 function CourseDetails({ data }: Props) {
   const [open, setOpen] = useState(false);
@@ -22,14 +44,82 @@ function CourseDetails({ data }: Props) {
 
   const isPurchased =
     user && user?.courses?.find((item: any) => item._id === data._id);
+  const courseId = data._id;
 
-  const handleOrder = (e: any) => {
-    setOpen(true);
- 
+  const handleOrder = async (amount: number) => {
+    const scriptLoaded = await loadRazorpayScript();
+  
+    if (!scriptLoaded) {
+      console.error("❌ Razorpay SDK failed to load");
+      alert("Razorpay SDK failed to load. Please refresh and try again.");
+      return;
+    }
+  
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/v1/make-payment",
+        { amount }
+      );
+  
+      if (!response.data || !response.data.order_id) {
+        alert("Failed to get order ID from server.");
+        return;
+      }
+  
+      const { order_id } = response.data;
+  
+      if (typeof window !== "undefined" && window.Razorpay) {
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: amount * 100,
+          currency: "INR",
+          name: "LearnifyHub",
+          description: "Purchase Course",
+          order_id,
+          handler: async function (response: any) {
+            const paymentData = {
+              courseId,
+              payment_Info: {
+                id: response.razorpay_payment_id,
+                order_id: response.razorpay_order_id,
+                signature: response.razorpay_signature,
+              },
+            };
+  
+            const verifyPayment = await axios.post(
+              "http://localhost:8080/api/v1/create-order",
+              paymentData,
+              { withCredentials: true }
+            );
+            console.log('verify payment',verifyPayment)
+            if (verifyPayment.data.success) {
+              toast.success(verifyPayment.data.message)
+              window.location.reload();
+            } else {
+              alert("❌ Payment Verification Failed.");
+            }
+          },
+          prefill: {
+            email: user?.email || "user@example.com",
+          },
+          theme: { color: "#528FF0" },
+        };
+  
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+      } else {
+        console.error("❌ Razorpay SDK not loaded");
+        alert("Razorpay SDK not loaded. Please refresh and try again.");
+      }
+    } catch (error) {
+      console.error("❌ Payment initiation error:", error);
+      alert("Something went wrong while processing your payment.");
+    }
   };
-  console.log(data.demoUrl)
+  
+  console.log(data.demoUrl);
   return (
-    <>
+    <div> 
       <div className="w-[90%] 800px:w-[90%] m-auto py-5">
         <div className="w-full flex flex-col-reverse 800px:flex-row">
           <div className="w-full 800px:[65%] 800px:pr-5">
@@ -178,7 +268,7 @@ function CourseDetails({ data }: Props) {
                 ) : (
                   <div
                     className="inline-block px-3 mt-2 py-2 bg-blue-500 text-white rounded-md font-medium hover:bg-blue-700 cursor-pointer"
-                    onClick={handleOrder}
+                    onClick={() => handleOrder(data.price)}
                   >
                     Buy Now {data.price} ₹
                   </div>
@@ -208,7 +298,20 @@ function CourseDetails({ data }: Props) {
           } */}
         </>
       </div>
-    </>
+      {open && (
+        <div className="w-full h-screen bg-[#00000036] fixed top-0 left-0 z-50 flex items-center justify-center">
+          <div className="w-[500px] min-h-[500px] bg-white rounded-lg shadow p-3">
+            <div className="w-full flex justify-end">
+              <IoCloseOutline
+                size={40}
+                className="text-black cursor-pointer"
+                onClick={() => setOpen(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
