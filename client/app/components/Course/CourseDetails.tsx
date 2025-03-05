@@ -96,7 +96,7 @@ function CourseDetails({ data }: Props) {
               toast.success(verifyPayment.data.message)
               window.location.reload();
             } else {
-              alert("❌ Payment Verification Failed.");
+              alert(" Payment Verification Failed.");
             }
           },
           prefill: {
@@ -108,11 +108,11 @@ function CourseDetails({ data }: Props) {
         const razorpay = new window.Razorpay(options);
         razorpay.open();
       } else {
-        console.error("❌ Razorpay SDK not loaded");
+        console.error(" Razorpay SDK not loaded");
         alert("Razorpay SDK not loaded. Please refresh and try again.");
       }
     } catch (error) {
-      console.error("❌ Payment initiation error:", error);
+      console.error(" Payment initiation error:", error);
       alert("Something went wrong while processing your payment.");
     }
   };
