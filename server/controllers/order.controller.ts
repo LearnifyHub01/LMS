@@ -13,6 +13,8 @@ import { getAllOrdersService, newOrder } from "../services/order.service";
 import { ICourse } from "../models/course.model";
 import { tryCatch } from "bullmq";
 import Razorpay from "razorpay";
+import { redis } from "../utils/redis";
+import { json } from "stream/consumers";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,       
@@ -102,16 +104,18 @@ export const createOrder = CatchAsyncError(
         message: `you have a new order from ${course?.name}`,
       });
 
-      if (course) {
-        await CourseModel.findByIdAndUpdate(
+    
+      const updatedCourse =  await CourseModel.findByIdAndUpdate(
           courseId,
           { $inc: { purchased: 1 } },
           { new: true }
-        );
-      }
+        ); 
+      
 
       await course.save();
-
+      console.log(updatedCourse)
+      await redis.set(courseId,JSON.stringify(updatedCourse), "EX", 604800)
+    
       newOrder(data, res, next);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));

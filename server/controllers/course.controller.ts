@@ -50,7 +50,6 @@ export const editCourse = CatchAsyncError(
       const thumbnail = data.thumbnail;
       const courseId = req.params.id;
       const courseData = (await CourseModel.findById(courseId)) as any;
-      console.log(courseData.thumbnail)
       if (thumbnail && !thumbnail.startsWith("http")) {
         await cloudinary.v2.uploader.destroy(courseData.thumbnail);
         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
@@ -61,7 +60,6 @@ export const editCourse = CatchAsyncError(
           url: myCloud.secure_url,
         };
       }
-
       if (thumbnail.startsWith("https")) {
         data.thumbnail = {
           public_id: courseData?.thumbnail.public_id,
@@ -116,6 +114,7 @@ export const getSingleCourse = CatchAsyncError(
           succcess: true,
           course,
         });
+        //console.log('course from redis',course)
       } else {
         const course = await CourseModel.findById(req.params.id).select(
           "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
@@ -126,6 +125,7 @@ export const getSingleCourse = CatchAsyncError(
           succcess: true,
           course,
         });
+       // console.log('course from Db',course)
       }
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
