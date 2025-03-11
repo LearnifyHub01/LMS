@@ -1,5 +1,5 @@
-import React from 'react';
-import Image from 'next/image';
+import React from "react";
+import Image from "next/image";
 
 interface Review {
   name: string;
@@ -21,7 +21,7 @@ const ReviewCard: React.FC<Props> = ({ item }) => {
           alt={`${item.name}'s avatar`}
           width={60}
           height={60}
-          className="rounded-full mr-4 border-2 border-indigo-500 p-1"
+          className="rounded-full mr-4 p-1"
         />
         <div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white font-poppins">
@@ -33,9 +33,13 @@ const ReviewCard: React.FC<Props> = ({ item }) => {
         </div>
       </div>
       <p className="text-gray-700 dark:text-gray-300 font-roboto relative text-base leading-relaxed">
-        <span className="absolute -top-4 -left-2 text-3xl text-indigo-500 opacity-50 font-serif">“</span>
+        <span className="absolute -top-4 -left-2 text-3xl text-indigo-500 opacity-50 font-serif">
+          “
+        </span>
         {item.comment}
-        <span className="absolute -bottom-4 -right-2 text-3xl text-indigo-500 opacity-50 font-serif">”</span>
+        <span className="absolute -bottom-4 -right-2 text-3xl text-indigo-500 opacity-50 font-serif">
+          ”
+        </span>
       </p>
     </div>
   );

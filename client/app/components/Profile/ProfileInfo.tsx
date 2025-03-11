@@ -12,7 +12,7 @@ import { RootState } from "@/redux/store";
 import {
   useEditProfileMutation,
   useUpdateAvatarMutation,
-  useDeleteUserMutation, 
+  useDeleteUserMutation,
 } from "@/redux/features/user/userApi";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import { useLogOutQuery } from "@/redux/features/auth/authApi";
@@ -71,8 +71,10 @@ const ProfileInfo: FC<Props> = ({ user }) => {
   const [editProfile, { isSuccess, error }] = useEditProfileMutation();
   const [updateAvatar, { isSuccess: success, error: updateError }] =
     useUpdateAvatarMutation();
-  const [deleteUser, { isLoading: deleteLoading, isSuccess: deleteSuccess, error: deleteError }] =
-    useDeleteUserMutation(); // Add delete user mutation
+  const [
+    deleteUser,
+    { isLoading: deleteLoading, isSuccess: deleteSuccess, error: deleteError },
+  ] = useDeleteUserMutation(); // Add delete user mutation
   const [loadUser, setLoadUser] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   useLoadUserQuery(undefined, { skip: !loadUser });
@@ -94,8 +96,12 @@ const ProfileInfo: FC<Props> = ({ user }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [openSidebar]);
 
-  const { data, isLoading: logoutLoading, isSuccess: logoutSuccess, error: logoutError } =
-    useLogOutQuery(undefined, { skip: !logout });
+  const {
+    data,
+    isLoading: logoutLoading,
+    isSuccess: logoutSuccess,
+    error: logoutError,
+  } = useLogOutQuery(undefined, { skip: !logout });
 
   const handleLogOut = async () => {
     await signOut({ redirect: false });
@@ -215,7 +221,10 @@ const ProfileInfo: FC<Props> = ({ user }) => {
                 {user?.name
                   ? user?.name
                       .split(" ")
-                      .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1))
+                      .map(
+                        (word: any) =>
+                          word.charAt(0).toUpperCase() + word.slice(1)
+                      )
                       .join(" ")
                   : "User Name"}
               </h2>
@@ -224,17 +233,35 @@ const ProfileInfo: FC<Props> = ({ user }) => {
               )}
             </div>
           </div>
-          <p className="text-[#6A7F4D] dark:text-[#AABFCC] pt-2 mr-[20%]">{user?.role}</p>
+          <p className="text-[#6A7F4D] dark:text-[#AABFCC] pt-2 mr-[20%]">
+            {user?.role}
+          </p>
         </div>
 
         <div className="mt-4 w-full">
           <MenuItem icon={<HomeOutlined />} title="Home" to="/" />
           {user.role === "admin" && (
-            <MenuItem icon={<Dashboard />} title="Admin Dashboard" to="/admin" />
+            <MenuItem
+              icon={<Dashboard />}
+              title="Admin Dashboard"
+              to="/admin"
+            />
           )}
-          <MenuItem icon={<School />} title="Enrolled Courses" to="/profile/viewcourses" />
-          <MenuItem icon={<Lock />} title="Change Password" to="/profile/changepassword" />
-          <MenuItem icon={<Memory />} title="Device Info" to="/profile/sessioninformation" />
+          <MenuItem
+            icon={<School />}
+            title="Enrolled Courses"
+            to="/profile/viewcourses"
+          />
+          <MenuItem
+            icon={<Lock />}
+            title="Change Password"
+            to="/profile/changepassword"
+          />
+          <MenuItem
+            icon={<Memory />}
+            title="Device Info"
+            to="/profile/sessioninformation"
+          />
         </div>
       </Menu>
 
@@ -323,17 +350,19 @@ const ProfileInfo: FC<Props> = ({ user }) => {
               "Logout"
             )}
           </button>
-          <button
-            className="w-[15%] ml-[10%] mt-[20%] rounded-md bg-red-600 text-white py-3 hover:bg-red-500 shadow-lg"
-            onClick={handleDeleteClick}
-            disabled={deleteLoading}
-          >
-            {deleteLoading ? (
-              <FaSpinner className="animate-spin text-white" size={20} />
-            ) : (
-              "Delete Account"
-            )}
-          </button>
+          {user.role === "user" && (
+            <button
+              className="w-[15%] ml-[10%] mt-[20%] rounded-md bg-red-600 text-white py-3 hover:bg-red-500 shadow-lg"
+              onClick={handleDeleteClick}
+              disabled={deleteLoading}
+            >
+              {deleteLoading ? (
+                <FaSpinner className="animate-spin text-white" size={20} />
+              ) : (
+                "Delete Account"
+              )}
+            </button>
+          )}
         </form>
       </div>
 
@@ -364,7 +393,10 @@ const ProfileInfo: FC<Props> = ({ user }) => {
           >
             Confirm Deletion
           </Typography>
-          <Typography id="delete-confirmation-description" sx={{ mb: 2, color: "#666" }}>
+          <Typography
+            id="delete-confirmation-description"
+            sx={{ mb: 2, color: "#666" }}
+          >
             Are you sure you want to delete the user with email{" "}
             <strong>{selectedUserEmail}</strong>? This action cannot be undone.
           </Typography>

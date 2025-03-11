@@ -2,7 +2,7 @@ import { useGetCourseDetailsQuery } from "@/redux/features/courses/coursesApi";
 import React, { useState } from "react";
 import Loader from "../Loader/Loader";
 import Heading from "@/app/utils/Heading";
-import Header from "../Header";
+import Header from "../../profile/Header1";
 import Footer from "../Footer";
 import CourseDetails from "./CourseDetails";
 

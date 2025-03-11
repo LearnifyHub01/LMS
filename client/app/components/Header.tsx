@@ -311,17 +311,22 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                 LearnifyHub
               </Link>
               {user ? (
-                <button
-                  onClick={() => setTeachModalOpen(true)}
-                  className="ml-4 hidden 800px:block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                >
-                  Teach With Us
-                </button>
-              //   <button className="text-[clamp(1rem,1.5vw,2rem)] p-[clamp(0.5rem,1vw,2rem)] m-[clamp(0.25rem,0.5vw,1rem)] bg-blue-500 text-white rounded">
-              //   Teach With Us
-              // </button>
-              ) : 
-             null}
+                user.role === "admin" ? (
+                  <button
+                    onClick={() => setTeachModalOpen(true)}
+                    className="ml-4 hidden 800px:block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Instructor
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setTeachModalOpen(true)}
+                    className="ml-4 hidden 800px:block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Teach With Us
+                  </button>
+                )
+              ) : null}
             </div>
             <div className="flex items-center justify-center gap-0 mr-10">
               <NavItems

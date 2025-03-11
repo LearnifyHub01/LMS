@@ -208,14 +208,14 @@ const Header: FC<Props> = ({ activeItem, setOpen }) => {
 
             {/* Desktop Navigation */}
             <div className="flex items-center gap-4">
-                <NavItems
-                  activeItem={activeItem}
-                  isMobile={false}
-                  user={user}
-                  setOpen={setOpen}
-                  openSidebar={openSidebar}
-                  setOpenSidebar={setOpenSidebar}
-                />
+              <NavItems
+                activeItem={activeItem}
+                isMobile={false}
+                user={user}
+                setOpen={setOpen}
+                openSidebar={openSidebar}
+                setOpenSidebar={setOpenSidebar}
+              />
               <ThemeSwitcher />
 
               {/* Mobile Menu Button */}

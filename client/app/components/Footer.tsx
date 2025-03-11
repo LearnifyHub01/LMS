@@ -1,12 +1,12 @@
 import React from "react";
 import Link from "next/link";
-import { Twitter, Instagram, LinkedIn, YouTube } from "@mui/icons-material";
+import { X, Instagram, LinkedIn, YouTube, Facebook } from "@mui/icons-material";
 import FitbitIcon from '@mui/icons-material/Fitbit';
 type Props = {};
 
 const Footer: React.FC<Props> = () => {
   return (
-    <footer className="w-full bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+    <footer className="w-full bg-gray-100 dark:bg-gray-900 transition-colors duration-400">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 py-10">
           {/* 1st Column - Logo Section (Moved to Left) */}
@@ -120,15 +120,23 @@ const Footer: React.FC<Props> = () => {
               href="https://twitter.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-9 h-9 rounded-full bg-gray-600 dark:bg-gray-700 flex justify-center items-center hover:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors duration-300"
+              className="w-9 h-9 rounded-full bg-gray-600 dark:bg-gray-700 flex justify-center items-center hover:bg-black dark:hover:bg-black transition-colors duration-300"
             >
-              <Twitter className="text-white" />
+              <X className="text-white" />
+            </a>
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-full bg-gray-600 dark:bg-gray-700 flex justify-center items-center hover:bg-[#316FF6] dark:hover:bg-[#316FF6] transition-colors duration-300"
+            >
+              <Facebook className="text-white" />
             </a>
             <a
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-9 h-9 rounded-full bg-gray-600 dark:bg-gray-700 flex justify-center items-center hover:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors duration-300"
+              className="w-9 h-9 rounded-full bg-gray-600 dark:bg-gray-700 flex justify-center items-center hover:bg-[#FCAF45] dark:hover:bg-pink-600 transition-colors duration-300"
             >
               <Instagram className="text-white" />
             </a>
@@ -136,7 +144,7 @@ const Footer: React.FC<Props> = () => {
               href="https://linkedin.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-9 h-9 rounded-full bg-gray-600 dark:bg-gray-700 flex justify-center items-center hover:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors duration-300"
+              className="w-9 h-9 rounded-full bg-gray-600 dark:bg-gray-700 flex justify-center items-center hover:bg-[#0077B5] dark:hover:bg-[#0077B5] transition-colors duration-300"
             >
               <LinkedIn className="text-white" />
             </a>
@@ -144,7 +152,7 @@ const Footer: React.FC<Props> = () => {
               href="https://youtube.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-9 h-9 rounded-full bg-gray-600 dark:bg-gray-700 flex justify-center items-center hover:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors duration-300"
+              className="w-9 h-9 rounded-full bg-gray-600 dark:bg-gray-700 flex justify-center items-center hover:bg-[#FF0000] dark:hover:bg-[#FF0000] transition-colors duration-300"
             >
               <YouTube className="text-white" />
             </a>
