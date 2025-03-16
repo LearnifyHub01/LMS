@@ -7,7 +7,6 @@ import axios from "axios";
 
 export const getAllCoursesService = async (req:any,res: Response) => {
   const userId =req.user._id;
-  console.log(userId)
   const courses = await CourseModel.find({ publisher: userId }).sort({ createdAt: -1 });
   console.log(courses)
   res.status(201).json({
@@ -15,7 +14,6 @@ export const getAllCoursesService = async (req:any,res: Response) => {
     courses,
   });
 };
-
 
 export const  getVideoLength= async(videoId: string): Promise<number>=> {
   try {

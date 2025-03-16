@@ -146,9 +146,6 @@
 
 // const CourseModel:Model<ICourse> = mongoose.model('Course',courseSchema)
 // export default CourseModel
-
-
-
 import mongoose ,{Document, Model,Schema, Types} from "mongoose";
 import { IUser } from "./user.model";
 

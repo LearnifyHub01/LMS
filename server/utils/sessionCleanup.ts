@@ -2,16 +2,10 @@ import cron from "node-cron";
 import UserModel from "../models/user.model";
 import { io } from "../server";
 
-// Session expiration time (1 minute for testing)
 const SESSION_EXPIRATION_MS =  7 * 24 * 60 * 60 * 1000;
 
-// Run the cron job every minute
 cron.schedule("* * * * *", async () => {
- // console.log("🔄 Running session cleanup cron job...");
-
-  const now = Date.now(); // Get current timestamp in milliseconds
-
-  // Find users with expired sessions
+  const now = Date.now(); 
   const users = await UserModel.find({ "sessions.loginTime": { $exists: true } });
 
   for (const user of users) {
