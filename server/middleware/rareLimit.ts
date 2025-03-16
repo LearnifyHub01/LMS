@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { redis } from "../utils/";
+import { redis } from "../utils/redis";
 
 const RATE_LIMIT_WINDOW = 60; // 1-minute window
 const MAX_REQUESTS = 5; // Limit per window

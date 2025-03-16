@@ -13,6 +13,7 @@ import NotificationModel from "../models/notification.model";
 import { getAllUsersService } from "../services/user.service";
 import axios from "axios";
 import { io } from "../server";
+import userModel, { IUser } from "../models/user.model";
 
 //upload course
 export const uploadCourse = CatchAsyncError(
@@ -148,6 +149,13 @@ export const getAllCourses = CatchAsyncError(
       } else {
         const courses = await CourseModel.find().select(
           "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
+        )
+        .populate(
+          {path: 'publisher',
+            model: 'User',     
+            select: 'name email avatar' }
+            
+          
         );
         res.status(200).json({
           success: true,
@@ -323,6 +331,37 @@ export const addAnswer = CatchAsyncError(
   }
 );
 
+//get user course
+
+export const getUserCourse = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id;
+      const user = await userModel
+        .findById(userId)
+        .select('_id name email role courses') 
+        .populate({
+          path: 'courses', 
+          populate: {
+            path: 'publisher',
+            model: 'User',     
+            select: 'name email avatar' 
+          }
+        });
+
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
 //add review in course
 
 interface IReviewData {
@@ -367,13 +406,18 @@ export const addReview = CatchAsyncError(
 
       await course?.save();
 
-      const notification = {
-        title: "New Review Received",
-        message: `${req.user?.name} has given a review in ${course?.name}`,
-      };
+      // const notification = {
+      //   title: "New Review Received",
+      //   message: `${req.user?.name} has given a review in ${course?.name}`,
+      // };
 
       //create notification
-
+      await NotificationModel.create({
+        user: req?.user?._id,
+        title: "New Question Reply Received",
+        message: `You have a new question reply in ${course?.name}`,
+      });
+      
       res.status(200).json({
         success: true,
         course,

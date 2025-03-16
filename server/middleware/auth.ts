@@ -46,6 +46,7 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     }
 
     const decoded = jwt.verify(access_token, process.env.ACCESS_TOKEN as string) as { id: string };
+  
 
     if (!decoded?.id) {
       return next(new ErrorHandler("Invalid token", 401));

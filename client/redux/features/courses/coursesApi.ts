@@ -169,6 +169,14 @@ export const courseApi = apiSlice.injectEndpoints({
 
     getUsersAllCourses: builder.query({
       query: () => ({
+        url: `get-all-courses`,
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+
+    getUsersCourses: builder.query({
+      query: () => ({
         url: `get-courses`,
         method: "GET",
         credentials: "include" as const,
@@ -219,7 +227,7 @@ export const courseApi = apiSlice.injectEndpoints({
     }),
 
     addReviewInCourse: builder.mutation({
-      query: ({ review, rating, courseId }: any) => ({
+      query: ({  review, rating, courseId }: any) => ({
         url: `add-review/${courseId}`,
         body: {
           review,
@@ -235,6 +243,7 @@ export const courseApi = apiSlice.injectEndpoints({
 export const {
   useCreateCourseMutation,
   useGetAllCoursesQuery,
+  useGetUsersCoursesQuery,
   useSearchCoursesQuery,
   useDeleteCourseMutation,
   useEditCourseMutation,
@@ -245,3 +254,4 @@ export const {
   useAddAnswerInQuestionMutation,
   useAddReviewInCourseMutation,
 } = courseApi;
+

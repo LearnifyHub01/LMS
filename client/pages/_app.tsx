@@ -1,5 +1,6 @@
 import type { AppProps } from "next/app";
 import Script from "next/script";
+import { Toaster } from '@/app/utils/Toaster'
 
 export default function myApp({ Component, pageProps }: AppProps) {
   return (

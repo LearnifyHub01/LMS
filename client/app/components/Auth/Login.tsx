@@ -9,7 +9,7 @@ import {
 import { FaSpinner } from "react-icons/fa"
 import { FcGoogle } from "react-icons/fc";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { signIn } from "next-auth/react";
 import { redirect } from "next/navigation";
 
@@ -50,7 +50,9 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
     setFadeIn(true);
 
     if (isSuccess) {
-      toast.success("Login Successfully");
+      toast.success("Login Successfully",{
+        description: "Start Your Learning Journey",
+      });
       setOpen(false);
     }
     if (error) {
